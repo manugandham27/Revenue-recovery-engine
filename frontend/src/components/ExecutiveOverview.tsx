@@ -12,7 +12,9 @@ import {
   Layers,
   ArrowUpRight,
   CheckCircle,
-  XCircle
+  XCircle,
+  Play,
+  RotateCw
 } from "lucide-react";
 import { 
   BarChart, 
@@ -39,6 +41,14 @@ export default function ExecutiveOverview({
   modelMetrics,
   onResetDemo
 }: ExecutiveOverviewProps) {
+  const [isSimulating, setIsSimulating] = React.useState(false);
+
+  const handleSimulate = async () => {
+    setIsSimulating(true);
+    await onResetDemo();
+    setTimeout(() => setIsSimulating(false), 1500);
+  };
+
   const formatCurrency = (amount: number = 0) => {
     if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(2)} Cr`;
     if (amount >= 100000) return `₹${(amount / 100000).toFixed(2)} L`;
@@ -56,12 +66,6 @@ export default function ExecutiveOverview({
       Baseline: baselineData?.baseline?.total_attempts_made || 21230,
       RevenueOS: baselineData?.revenue_os?.total_attempts_made || 8350,
     }
-  ];
-
-  const pieData = [
-    { name: "Successful Recoveries", value: metrics?.recovery_rate ? metrics.recovery_rate * 100 : 79.3, color: "#10B981" },
-    { name: "Policy Safety Blocks", value: 15.2, color: "#F59E0B" },
-    { name: "Human Review Escalated", value: 5.5, color: "#8B5CF6" },
   ];
 
   const modelEval = modelMetrics?.metrics || {
@@ -89,10 +93,12 @@ export default function ExecutiveOverview({
           </div>
         </div>
         <button
-          onClick={onResetDemo}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-600/30 transition-all whitespace-nowrap cursor-pointer"
+          onClick={handleSimulate}
+          disabled={isSimulating}
+          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-600/30 transition-all whitespace-nowrap cursor-pointer flex items-center space-x-2 disabled:opacity-50"
         >
-          Re-Run Batch Simulation
+          <RotateCw className={`w-3.5 h-3.5 ${isSimulating ? "animate-spin" : ""}`} />
+          <span>{isSimulating ? "Re-Evaluating..." : "Re-Run Batch Simulation"}</span>
         </button>
       </div>
 
