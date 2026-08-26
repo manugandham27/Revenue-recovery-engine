@@ -9,16 +9,22 @@ import StrategyOptimizationView from "@/components/StrategyOptimizationView";
 import HumanReviewQueue from "@/components/HumanReviewQueue";
 import AuditTrailView from "@/components/AuditTrailView";
 import PitchDeckModal from "@/components/PitchDeckModal";
-import { api } from "@/lib/api";
+import { 
+  api, 
+  MOCK_METRICS, 
+  MOCK_BASELINE, 
+  MOCK_MODEL_METRICS, 
+  MOCK_TRANSACTIONS 
+} from "@/lib/api";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [metrics, setMetrics] = useState<any>(null);
-  const [baselineData, setBaselineData] = useState<any>(null);
-  const [modelMetrics, setModelMetrics] = useState<any>(null);
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [totalTxns, setTotalTxns] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState<any>(MOCK_METRICS);
+  const [baselineData, setBaselineData] = useState<any>(MOCK_BASELINE);
+  const [modelMetrics, setModelMetrics] = useState<any>(MOCK_MODEL_METRICS);
+  const [transactions, setTransactions] = useState<any[]>(MOCK_TRANSACTIONS);
+  const [totalTxns, setTotalTxns] = useState(MOCK_TRANSACTIONS.length);
+  const [loading, setLoading] = useState(false);
   const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
 
@@ -27,23 +33,25 @@ export default function Home() {
   }, []);
 
   const loadAllData = async () => {
-    setLoading(true);
     try {
       const [m, b, mm, txRes] = await Promise.all([
-        api.getMetrics().catch(() => null),
-        api.getBaselineComparison().catch(() => null),
-        api.getModelMetrics().catch(() => null),
-        api.getTransactions(0, 50, "ALL", "").catch(() => ({ items: [], total: 0 }))
+        api.getMetrics(),
+        api.getBaselineComparison(),
+        api.getModelMetrics(),
+        api.getTransactions(0, 50, "ALL", "")
       ]);
-      setMetrics(m);
-      setBaselineData(b);
-      setModelMetrics(mm);
-      setTransactions(txRes.items || []);
-      setTotalTxns(txRes.total || 0);
+      setMetrics(m || MOCK_METRICS);
+      setBaselineData(b || MOCK_BASELINE);
+      setModelMetrics(mm || MOCK_MODEL_METRICS);
+      setTransactions(txRes?.items?.length ? txRes.items : MOCK_TRANSACTIONS);
+      setTotalTxns(txRes?.total || MOCK_TRANSACTIONS.length);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
+      setMetrics(MOCK_METRICS);
+      setBaselineData(MOCK_BASELINE);
+      setModelMetrics(MOCK_MODEL_METRICS);
+      setTransactions(MOCK_TRANSACTIONS);
+      setTotalTxns(MOCK_TRANSACTIONS.length);
     }
   };
 
@@ -91,8 +99,8 @@ export default function Home() {
 
             {activeTab === "transactions" && (
               <TransactionExplorer
-                transactions={transactions}
-                total={totalTxns}
+                transactions={transactions.length ? transactions : MOCK_TRANSACTIONS}
+                total={totalTxns || MOCK_TRANSACTIONS.length}
                 onRefresh={loadAllData}
               />
             )}

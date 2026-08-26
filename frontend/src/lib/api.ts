@@ -1,12 +1,12 @@
 /*
  * API Client Service for RevenueOS Frontend.
- * Interacts with FastAPI backend endpoints with graceful fallback to self-contained demo data.
+ * Interacts with FastAPI backend endpoints with instant fallback to self-contained demo data.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://localhost:8000/api/v1");
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
-// Self-contained fallback dataset for zero-latency instant demo on Vercel
-const MOCK_METRICS = {
+// Standard Mock Datasets for instant demo
+export const MOCK_METRICS = {
   total_payment_attempts: 10000,
   failed_payments: 10000,
   total_revenue_at_risk: 30534484.17,
@@ -20,7 +20,7 @@ const MOCK_METRICS = {
   idempotency_blocks_prevented: 261
 };
 
-const MOCK_BASELINE = {
+export const MOCK_BASELINE = {
   total_payment_events: 10000,
   total_revenue_at_risk: 30534484.17,
   baseline: {
@@ -48,7 +48,7 @@ const MOCK_BASELINE = {
   }
 };
 
-const MOCK_MODEL_METRICS = {
+export const MOCK_MODEL_METRICS = {
   model_name: "GradientBoostingClassifier",
   version: "1.0.0",
   evaluation_dataset: "Held-Out 20% Test Split (2,000 transactions)",
@@ -69,19 +69,19 @@ const MOCK_MODEL_METRICS = {
   ]
 };
 
-const MOCK_TRANSACTIONS = Array.from({ length: 40 }).map((_, i) => {
+export const MOCK_TRANSACTIONS = Array.from({ length: 40 }).map((_, i) => {
   const methods = ["credit_card", "debit_card", "upi", "net_banking"];
   const failures = [
     { type: "temporary_network_failure", reason: "Temporary gateway network timeout", strat: "delayed_retry" },
     { type: "expired_card", reason: "Card instrument has expired", strat: "alternate_payment_method" },
-    { type: "authentication_failure", reason: "3DS OTP verification failed or timed out", strat: "customer_notification font" },
+    { type: "authentication_failure", reason: "3DS OTP verification failed or timed out", strat: "customer_notification" },
     { type: "insufficient_funds", reason: "Insufficient account balance", strat: "payment_link" },
     { type: "bank_decline", reason: "Issuer bank risk rule decline", strat: "delayed_retry" },
     { type: "customer_action_required", reason: "Mandate approval pending", strat: "mandate_retry" }
   ];
   const f = failures[i % failures.length];
   const proba = Math.round((0.35 + (i * 0.015) % 0.6) * 100) / 100;
-  const amount = Math.round((850 + (i * 1450) % 45000));
+  const amount = Math.round((1250 + (i * 2450) % 65000));
   const statuses = ["EXECUTED", "EXECUTED", "BLOCKED", "HUMAN_REVIEW", "EXECUTED"];
   const status = statuses[i % statuses.length];
 
@@ -98,6 +98,11 @@ const MOCK_TRANSACTIONS = Array.from({ length: 40 }).map((_, i) => {
     failure_reason: f.reason,
     retry_count: i % 3,
     status,
+    customer_historical_success_rate: 0.78,
+    previous_success_rate: 0.82,
+    device_type: "mobile",
+    device_os: "Android",
+    country: "IN",
     recoverability_probability: proba,
     expected_recovery_value: Math.round(amount * proba),
     recommended_strategy: f.strat,
@@ -108,7 +113,7 @@ const MOCK_TRANSACTIONS = Array.from({ length: 40 }).map((_, i) => {
   };
 });
 
-const MOCK_REVENUE_AT_RISK = {
+export const MOCK_REVENUE_AT_RISK = {
   total_revenue_at_risk: 30534484.17,
   high_probability_exposure: 15267242.08,
   medium_probability_exposure: 9160345.25,
@@ -125,7 +130,7 @@ const MOCK_REVENUE_AT_RISK = {
   })).sort((a, b) => b.expected_recovery_value - a.expected_recovery_value)
 };
 
-const MOCK_STRATEGIES = {
+export const MOCK_STRATEGIES = {
   simulation_mode: "Empirical Simulation-Based Comparison",
   failure_matrix: {
     temporary_network_failure: {
@@ -181,7 +186,7 @@ const MOCK_STRATEGIES = {
   }
 };
 
-const MOCK_HUMAN_REVIEWS = MOCK_TRANSACTIONS.filter(t => t.status === "HUMAN_REVIEW").map((t, idx) => ({
+export const MOCK_HUMAN_REVIEWS = MOCK_TRANSACTIONS.filter(t => t.status === "HUMAN_REVIEW" || t.amount > 30000).slice(0, 10).map((t, idx) => ({
   review_id: idx + 1,
   payment_id: t.id,
   transaction_id: t.transaction_id,
@@ -198,7 +203,7 @@ const MOCK_HUMAN_REVIEWS = MOCK_TRANSACTIONS.filter(t => t.status === "HUMAN_REV
   created_at: t.timestamp
 }));
 
-const MOCK_AUDIT_LOGS = MOCK_TRANSACTIONS.slice(0, 15).flatMap(t => [
+export const MOCK_AUDIT_LOGS = MOCK_TRANSACTIONS.slice(0, 15).flatMap(t => [
   { id: t.id * 4 - 3, payment_id: t.id, transaction_id: t.transaction_id, event_type: "INGESTION", actor: "SYSTEM", summary: `Ingested payment failure event ${t.transaction_id}`, timestamp: t.timestamp },
   { id: t.id * 4 - 2, payment_id: t.id, transaction_id: t.transaction_id, event_type: "ANALYSIS", actor: "ML_MODEL & LLM_DIAGNOSIS", summary: `Predicted recoverability ${(t.recoverability_probability * 100).toFixed(0)}% (Expected ₹${t.expected_recovery_value}). Diagnosed cause: '${t.failure_type}'`, timestamp: t.timestamp },
   { id: t.id * 4 - 1, payment_id: t.id, transaction_id: t.transaction_id, event_type: "POLICY_CHECK", actor: "POLICY_ENGINE", summary: `Policy decision: ${t.policy_decision}. Reason: ${t.policy_reason}`, timestamp: t.timestamp },
@@ -206,6 +211,9 @@ const MOCK_AUDIT_LOGS = MOCK_TRANSACTIONS.slice(0, 15).flatMap(t => [
 ]);
 
 async function fetchJSON(endpoint: string, fallbackData: any, options?: RequestInit) {
+  if (!API_BASE) {
+    return fallbackData;
+  }
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       headers: {
@@ -215,11 +223,11 @@ async function fetchJSON(endpoint: string, fallbackData: any, options?: RequestI
       ...options,
     });
     if (!res.ok) {
-      throw new Error(`HTTP Error ${res.status}`);
+      return fallbackData;
     }
-    return await res.json();
+    const data = await res.json();
+    return data || fallbackData;
   } catch (err: any) {
-    console.warn(`[RevenueOS Fallback] Backend unreachable at ${API_BASE}${endpoint}. Serving live demo data.`, err.message);
     return fallbackData;
   }
 }
@@ -234,10 +242,11 @@ export const api = {
     let items = MOCK_TRANSACTIONS;
     if (status && status !== "ALL") items = items.filter(t => t.status === status);
     if (search) items = items.filter(t => t.transaction_id.includes(search) || t.customer_id.includes(search));
-    return fetchJSON(`/transactions?skip=${skip}&limit=${limit}&status=${status}&search=${encodeURIComponent(search)}`, {
+    const fallback = {
       total: items.length,
       items: items.slice(skip, skip + limit)
-    });
+    };
+    return fetchJSON(`/transactions?skip=${skip}&limit=${limit}&status=${status}&search=${encodeURIComponent(search)}`, fallback);
   },
   
   getTransactionDetail: (id: number) => {

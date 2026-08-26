@@ -10,11 +10,11 @@ import {
   MessageSquare,
   Clock
 } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, MOCK_HUMAN_REVIEWS } from "@/lib/api";
 
 export default function HumanReviewQueue() {
-  const [cases, setCases] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [cases, setCases] = useState<any[]>(MOCK_HUMAN_REVIEWS);
+  const [loading, setLoading] = useState(false);
   const [selectedCase, setSelectedCase] = useState<any>(null);
   const [actionDecision, setActionDecision] = useState<string>("APPROVED");
   const [overrideStrategy, setOverrideStrategy] = useState<string>("alternate_payment_method");
@@ -26,14 +26,14 @@ export default function HumanReviewQueue() {
   }, []);
 
   const loadCases = async () => {
-    setLoading(true);
     try {
       const res = await api.getHumanReviews();
-      setCases(res);
+      if (res && res.length) {
+        setCases(res);
+      }
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
+      setCases(MOCK_HUMAN_REVIEWS);
     }
   };
 
@@ -47,9 +47,16 @@ export default function HumanReviewQueue() {
         actionDecision === "OVERRIDDEN" ? overrideStrategy : selectedCase.ai_recommendation,
         reasonNote || "Human reviewer approval"
       );
+      // Locally update state for instant UI update
+      setCases(prev => prev.map(c => c.review_id === selectedCase.review_id ? {
+        ...c,
+        status: actionDecision,
+        human_decision: actionDecision === "OVERRIDDEN" ? overrideStrategy : selectedCase.ai_recommendation,
+        override_reason: reasonNote || "Human reviewer action",
+        reviewed_by: "Fintech Ops Lead"
+      } : c));
       setSelectedCase(null);
       setReasonNote("");
-      loadCases();
     } catch (err) {
       console.error(err);
     } finally {
@@ -61,12 +68,9 @@ export default function HumanReviewQueue() {
     return `₹${amount.toLocaleString("en-IN")}`;
   };
 
-  if (loading) {
-    return <div className="py-12 text-center text-slate-400 text-xs">Loading Human Review Queue...</div>;
-  }
-
-  const pendingCases = cases.filter(c => c.status === "PENDING");
-  const resolvedCases = cases.filter(c => c.status !== "PENDING");
+  const displayCases = cases.length ? cases : MOCK_HUMAN_REVIEWS;
+  const pendingCases = displayCases.filter(c => c.status === "PENDING");
+  const resolvedCases = displayCases.filter(c => c.status !== "PENDING");
 
   return (
     <div className="space-y-6">
