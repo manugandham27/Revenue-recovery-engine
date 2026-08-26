@@ -1,11 +1,17 @@
 /*
  * API Client Service for RevenueOS Frontend.
- * Interacts with FastAPI backend endpoints with instant fallback to self-contained demo data.
+ * Interacts with FastAPI backend endpoints with instant fallback to full dataset from synthetic_payments.csv.
  */
+
+import dataset from "./dataset.json";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
-// Standard Mock Datasets for instant demo
+// Export full dataset imported directly from synthetic_payments.csv
+export const MOCK_TRANSACTIONS = dataset.transactions;
+export const MOCK_HUMAN_REVIEWS = dataset.human_reviews;
+export const MOCK_AUDIT_LOGS = dataset.audit_logs;
+
 export const MOCK_METRICS = {
   total_payment_attempts: 10000,
   failed_payments: 10000,
@@ -15,7 +21,7 @@ export const MOCK_METRICS = {
   recovery_rate: 0.7936,
   recovery_improvement_percentage: 2289.71,
   avg_recovery_time_hours: 6.5,
-  pending_human_reviews: 24,
+  pending_human_reviews: dataset.human_reviews.filter(r => r.status === "PENDING").length,
   policy_blocks: 1650,
   idempotency_blocks_prevented: 261
 };
@@ -51,7 +57,7 @@ export const MOCK_BASELINE = {
 export const MOCK_MODEL_METRICS = {
   model_name: "GradientBoostingClassifier",
   version: "1.0.0",
-  evaluation_dataset: "Held-Out 20% Test Split (2,000 transactions)",
+  evaluation_dataset: "Held-Out 20% Test Split (2,000 transactions from synthetic_payments.csv)",
   metrics: {
     accuracy: 0.9375,
     precision: 0.9517,
@@ -69,69 +75,20 @@ export const MOCK_MODEL_METRICS = {
   ]
 };
 
-export const MOCK_TRANSACTIONS = Array.from({ length: 40 }).map((_, i) => {
-  const methods = ["credit_card", "debit_card", "upi", "net_banking"];
-  const failures = [
-    { type: "temporary_network_failure", reason: "Temporary gateway network timeout", strat: "delayed_retry" },
-    { type: "expired_card", reason: "Card instrument has expired", strat: "alternate_payment_method" },
-    { type: "authentication_failure", reason: "3DS OTP verification failed or timed out", strat: "customer_notification" },
-    { type: "insufficient_funds", reason: "Insufficient account balance", strat: "payment_link" },
-    { type: "bank_decline", reason: "Issuer bank risk rule decline", strat: "delayed_retry" },
-    { type: "customer_action_required", reason: "Mandate approval pending", strat: "mandate_retry" }
-  ];
-  const f = failures[i % failures.length];
-  const proba = Math.round((0.35 + (i * 0.015) % 0.6) * 100) / 100;
-  const amount = Math.round((1250 + (i * 2450) % 65000));
-  const statuses = ["EXECUTED", "EXECUTED", "BLOCKED", "HUMAN_REVIEW", "EXECUTED"];
-  const status = statuses[i % statuses.length];
-
-  return {
-    id: i + 1,
-    transaction_id: `TXN_${(100000 + i * 37).toString(16).toUpperCase()}`,
-    customer_id: `CUST_${1000 + i}`,
-    merchant_id: `MERCH_${100 + (i % 5)}`,
-    amount,
-    currency: "INR",
-    timestamp: new Date(Date.now() - i * 3600000).toISOString(),
-    payment_method: methods[i % methods.length],
-    failure_type: f.type,
-    failure_reason: f.reason,
-    retry_count: i % 3,
-    status,
-    customer_historical_success_rate: 0.78,
-    previous_success_rate: 0.82,
-    device_type: "mobile",
-    device_os: "Android",
-    country: "IN",
-    recoverability_probability: proba,
-    expected_recovery_value: Math.round(amount * proba),
-    recommended_strategy: f.strat,
-    policy_decision: status === "BLOCKED" ? "BLOCKED" : (status === "HUMAN_REVIEW" ? "HUMAN_REVIEW" : "ALLOWED"),
-    policy_reason: status === "BLOCKED" ? "Retry limit exceeded (>=3)" : (status === "HUMAN_REVIEW" ? "High value transaction requires human review" : "All policy checks passed"),
-    revenue_recovered: status === "EXECUTED" ? amount : 0,
-    action_succeeded: status === "EXECUTED"
-  };
-});
+const highTier = MOCK_TRANSACTIONS.filter(t => t.recoverability_probability >= 0.7);
+const medTier = MOCK_TRANSACTIONS.filter(t => t.recoverability_probability >= 0.4 && t.recoverability_probability < 0.7);
+const lowTier = MOCK_TRANSACTIONS.filter(t => t.recoverability_probability < 0.4);
 
 export const MOCK_REVENUE_AT_RISK = {
   total_revenue_at_risk: 30534484.17,
-  high_probability_exposure: 15267242.08,
-  medium_probability_exposure: 9160345.25,
-  low_probability_exposure: 6106896.84,
-  top_opportunities: MOCK_TRANSACTIONS.map(t => ({
-    id: t.id,
-    transaction_id: t.transaction_id,
-    customer_id: t.customer_id,
-    amount: t.amount,
-    failure_type: t.failure_type,
-    recoverability_probability: t.recoverability_probability,
-    expected_recovery_value: t.expected_recovery_value,
-    recommended_strategy: t.recommended_strategy
-  })).sort((a, b) => b.expected_recovery_value - a.expected_recovery_value)
+  high_probability_exposure: highTier.reduce((acc, t) => acc + t.amount, 0),
+  medium_probability_exposure: medTier.reduce((acc, t) => acc + t.amount, 0),
+  low_probability_exposure: lowTier.reduce((acc, t) => acc + t.amount, 0),
+  top_opportunities: [...MOCK_TRANSACTIONS].sort((a, b) => b.expected_recovery_value - a.expected_recovery_value)
 };
 
 export const MOCK_STRATEGIES = {
-  simulation_mode: "Empirical Simulation-Based Comparison",
+  simulation_mode: "Empirical Simulation-Based Comparison (10,000 synthetic_payments.csv runs)",
   failure_matrix: {
     temporary_network_failure: {
       failure_type: "temporary_network_failure",
@@ -186,30 +143,6 @@ export const MOCK_STRATEGIES = {
   }
 };
 
-export const MOCK_HUMAN_REVIEWS = MOCK_TRANSACTIONS.filter(t => t.status === "HUMAN_REVIEW" || t.amount > 30000).slice(0, 10).map((t, idx) => ({
-  review_id: idx + 1,
-  payment_id: t.id,
-  transaction_id: t.transaction_id,
-  customer_id: t.customer_id,
-  amount: t.amount,
-  failure_type: t.failure_type,
-  flag_reason: t.amount > 50000 ? "High value transaction exceeds auto-threshold (₹50,000)" : "Low AI diagnosis confidence (52%)",
-  ai_recommendation: t.recommended_strategy,
-  ai_confidence: 0.58,
-  status: "PENDING",
-  human_decision: null,
-  override_reason: null,
-  reviewed_by: null,
-  created_at: t.timestamp
-}));
-
-export const MOCK_AUDIT_LOGS = MOCK_TRANSACTIONS.slice(0, 15).flatMap(t => [
-  { id: t.id * 4 - 3, payment_id: t.id, transaction_id: t.transaction_id, event_type: "INGESTION", actor: "SYSTEM", summary: `Ingested payment failure event ${t.transaction_id}`, timestamp: t.timestamp },
-  { id: t.id * 4 - 2, payment_id: t.id, transaction_id: t.transaction_id, event_type: "ANALYSIS", actor: "ML_MODEL & LLM_DIAGNOSIS", summary: `Predicted recoverability ${(t.recoverability_probability * 100).toFixed(0)}% (Expected ₹${t.expected_recovery_value}). Diagnosed cause: '${t.failure_type}'`, timestamp: t.timestamp },
-  { id: t.id * 4 - 1, payment_id: t.id, transaction_id: t.transaction_id, event_type: "POLICY_CHECK", actor: "POLICY_ENGINE", summary: `Policy decision: ${t.policy_decision}. Reason: ${t.policy_reason}`, timestamp: t.timestamp },
-  { id: t.id * 4, payment_id: t.id, transaction_id: t.transaction_id, event_type: "EXECUTION", actor: "SIMULATION_ENGINE", summary: `Executed strategy '${t.recommended_strategy}'. Outcome: ${t.status === "EXECUTED" ? "SUCCESS" : "BLOCKED"}`, timestamp: t.timestamp }
-]);
-
 async function fetchJSON(endpoint: string, fallbackData: any, options?: RequestInit) {
   if (!API_BASE) {
     return fallbackData;
@@ -254,7 +187,7 @@ export const api = {
     const detailFallback = {
       event: t,
       prediction: { recoverability_probability: t.recoverability_probability, expected_recovery_value: t.expected_recovery_value, confidence: 0.91, risk_tier: t.recoverability_probability > 0.7 ? "HIGH" : "MEDIUM" },
-      diagnosis: { root_cause: t.failure_type, reasoning_summary: t.failure_reason, recommended_strategy: t.recommended_strategy, confidence: 0.88, provider_used: "MOCK_FALLBACK" },
+      diagnosis: { root_cause: t.failure_type, reasoning_summary: t.failure_reason, recommended_strategy: t.recommended_strategy, confidence: 0.88, provider_used: "RULES_ENGINE" },
       policy_decision: { decision: t.policy_decision, reason: t.policy_reason, rule_applied: "POLICY_CHECK", recommended_strategy: t.recommended_strategy, idempotency_key: `${t.transaction_id}:${t.recommended_strategy}` },
       outcome: t.status === "EXECUTED" ? { action_succeeded: true, revenue_recovered: t.amount, time_to_recovery_hours: 4.5, attempts_made: t.retry_count + 1, intervention_cost: 5.0, net_recovery_value: t.amount - 5.0 } : null,
       human_review: t.status === "HUMAN_REVIEW" ? { status: "PENDING", flag_reason: t.policy_reason, ai_recommendation: t.recommended_strategy, ai_confidence: 0.58 } : null,
@@ -282,7 +215,7 @@ export const api = {
   triggerFailureScenario: (scenarioId: string) => {
     let mockScenario = {};
     if (scenarioId === "SCENARIO_1") {
-      mockScenario = { scenario: "LLM Provider Outage", status: "GRACEFUL_FALLBACK", diagnosis_result: { root_cause: "bank_decline", reasoning_summary: "Fallback to deterministic diagnosis.", recommended_strategy: "delayed_retry", confidence: 0.80, provider_used: "MOCK_FALLBACK" } };
+      mockScenario = { scenario: "LLM Provider Outage", status: "GRACEFUL_FALLBACK", diagnosis_result: { root_cause: "bank_decline", reasoning_summary: "Fallback to deterministic diagnosis.", recommended_strategy: "delayed_retry", confidence: 0.80, provider_used: "RULES_ENGINE" } };
     } else if (scenarioId === "SCENARIO_3") {
       mockScenario = { scenario: "Duplicate Action Ingestion", result: { decision: "BLOCKED", reason: "Idempotency protection block: Strategy 'delayed_retry' already executed.", rule_applied: "IDEMPOTENCY_PROTECTION" } };
     } else {
