@@ -1,0 +1,67 @@
+{
+  "model_name": "GradientBoostingClassifier",
+  "version": "1.0.0",
+  "trained_at": "2026-08-26T22:24:28.326436",
+  "n_features": 42,
+  "feature_names": [
+    "log_amount",
+    "retry_count",
+    "customer_historical_success_rate",
+    "previous_success_rate",
+    "customer_payment_frequency",
+    "previous_failures",
+    "transaction_hour",
+    "day_of_week",
+    "amount_relative_to_historical_avg",
+    "log_time_since_prev_success",
+    "payment_method_credit_card",
+    "payment_method_debit_card",
+    "payment_method_net_banking",
+    "payment_method_upi",
+    "payment_method_wallet",
+    "failure_type_authentication_failure",
+    "failure_type_bank_decline",
+    "failure_type_customer_action_required",
+    "failure_type_expired_card",
+    "failure_type_insufficient_funds",
+    "failure_type_merchant_configuration",
+    "failure_type_temporary_network_failure",
+    "failure_type_unknown",
+    "subscription_status_active",
+    "subscription_status_canceled",
+    "subscription_status_none",
+    "subscription_status_trial",
+    "currency_EUR",
+    "currency_INR",
+    "currency_USD",
+    "device_type_desktop",
+    "device_type_mobile",
+    "device_type_tablet",
+    "device_os_Android",
+    "device_os_Windows",
+    "device_os_iOS",
+    "device_os_macOS",
+    "country_AE",
+    "country_GB",
+    "country_IN",
+    "country_SG",
+    "country_US"
+  ],
+  "metrics": {
+    "accuracy": 0.9375,
+    "precision": 0.9516824849007766,
+    "recall": 0.9411262798634812,
+    "f1": 0.9463749463749463,
+    "roc_auc": 0.9905731150352014,
+    "confusion_matrix": [
+      [
+        772,
+        56
+      ],
+      [
+        69,
+        1103
+      ]
+    ]
+  }
+}

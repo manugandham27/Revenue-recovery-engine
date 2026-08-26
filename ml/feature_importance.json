@@ -1,0 +1,170 @@
+[
+  {
+    "feature": "failure_type_insufficient_funds",
+    "importance": 0.3933671884913056
+  },
+  {
+    "feature": "failure_type_expired_card",
+    "importance": 0.20938674070698848
+  },
+  {
+    "feature": "failure_type_customer_action_required",
+    "importance": 0.07885285019386838
+  },
+  {
+    "feature": "failure_type_unknown",
+    "importance": 0.06571000398104865
+  },
+  {
+    "feature": "retry_count",
+    "importance": 0.06047454952361914
+  },
+  {
+    "feature": "customer_historical_success_rate",
+    "importance": 0.04498858586182775
+  },
+  {
+    "feature": "failure_type_merchant_configuration",
+    "importance": 0.04478141077831803
+  },
+  {
+    "feature": "failure_type_authentication_failure",
+    "importance": 0.021813329722021633
+  },
+  {
+    "feature": "payment_method_upi",
+    "importance": 0.019219255387180827
+  },
+  {
+    "feature": "failure_type_temporary_network_failure",
+    "importance": 0.016349187665681657
+  },
+  {
+    "feature": "failure_type_bank_decline",
+    "importance": 0.011819852797655793
+  },
+  {
+    "feature": "log_amount",
+    "importance": 0.006636110704070757
+  },
+  {
+    "feature": "previous_success_rate",
+    "importance": 0.005785339262501133
+  },
+  {
+    "feature": "log_time_since_prev_success",
+    "importance": 0.005633869688602469
+  },
+  {
+    "feature": "amount_relative_to_historical_avg",
+    "importance": 0.0035880425420193466
+  },
+  {
+    "feature": "previous_failures",
+    "importance": 0.0015884650777394497
+  },
+  {
+    "feature": "day_of_week",
+    "importance": 0.0012909298327727083
+  },
+  {
+    "feature": "transaction_hour",
+    "importance": 0.0011882055299448754
+  },
+  {
+    "feature": "customer_payment_frequency",
+    "importance": 0.0011497828718471746
+  },
+  {
+    "feature": "device_os_Windows",
+    "importance": 0.0008536420020855689
+  },
+  {
+    "feature": "device_os_Android",
+    "importance": 0.000607661179653769
+  },
+  {
+    "feature": "device_type_mobile",
+    "importance": 0.0005345907348050936
+  },
+  {
+    "feature": "subscription_status_trial",
+    "importance": 0.000526526727063021
+  },
+  {
+    "feature": "payment_method_debit_card",
+    "importance": 0.000495999173536358
+  },
+  {
+    "feature": "device_type_desktop",
+    "importance": 0.00044533635706757896
+  },
+  {
+    "feature": "currency_EUR",
+    "importance": 0.00035894595825424424
+  },
+  {
+    "feature": "device_os_macOS",
+    "importance": 0.0003179334414925427
+  },
+  {
+    "feature": "device_os_iOS",
+    "importance": 0.00026121629327078584
+  },
+  {
+    "feature": "subscription_status_canceled",
+    "importance": 0.0002408248205910906
+  },
+  {
+    "feature": "payment_method_credit_card",
+    "importance": 0.00023431162293574245
+  },
+  {
+    "feature": "country_GB",
+    "importance": 0.00022831572303847
+  },
+  {
+    "feature": "country_IN",
+    "importance": 0.0002251215330077174
+  },
+  {
+    "feature": "payment_method_wallet",
+    "importance": 0.0002205049525904122
+  },
+  {
+    "feature": "country_US",
+    "importance": 0.0002094739716957412
+  },
+  {
+    "feature": "payment_method_net_banking",
+    "importance": 0.0001752908733739076
+  },
+  {
+    "feature": "country_AE",
+    "importance": 0.00015810985051297166
+  },
+  {
+    "feature": "subscription_status_none",
+    "importance": 0.00011150790438965036
+  },
+  {
+    "feature": "subscription_status_active",
+    "importance": 6.457822532294105e-05
+  },
+  {
+    "feature": "device_type_tablet",
+    "importance": 4.522045381800513e-05
+  },
+  {
+    "feature": "currency_USD",
+    "importance": 3.227051336649789e-05
+  },
+  {
+    "feature": "currency_INR",
+    "importance": 1.870423726902759e-05
+  },
+  {
+    "feature": "country_SG",
+    "importance": 1.0212831845092982e-05
+  }
+]
