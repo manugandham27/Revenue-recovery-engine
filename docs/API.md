@@ -24,7 +24,7 @@ Interactive Swagger documentation is available at `http://localhost:8000/docs`.
 ### 4. Human-in-the-Loop & Audit
 - `GET /api/v1/human-review`: List escalated cases requiring operator review.
 - `POST /api/v1/human-review/{id}/decide`: Submit operator approval, rejection, or override.
-- `GET /api/v1/audit`: Query immutable decision audit logs.
+- `GET /api/v1/audit`: Query comprehensive decision audit logs.
 
 ### 5. Buildathon Demo Controls
 - `POST /api/v1/demo/reset-and-run`: Reset database, seed 10,000 transactions, and run demo walkthrough cases.

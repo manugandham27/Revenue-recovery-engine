@@ -755,7 +755,7 @@ def submit_human_review_decision(review_id: int, action: HumanReviewAction, db: 
 
 @router.get("/audit")
 def list_audit_trail(limit: int = 100, db: Session = Depends(get_db)):
-    """List full immutable audit trail log."""
+    """List comprehensive decision audit trail log."""
     logs = db.query(AuditLogModel).order_by(AuditLogModel.id.desc()).limit(limit).all()
     return [
         {
