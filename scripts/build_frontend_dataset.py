@@ -34,12 +34,12 @@ for idx, row in sample_df.iterrows():
     strat = strategies_map.get(f_type, "delayed_retry")
     retry_count = int(row["retry_count"])
     
-    # Realistic policy classification rules
+    # Realistic policy classification rules (escalates ~8% to human review)
     if retry_count >= 3:
         status = "BLOCKED"
         policy_decision = "BLOCKED"
         policy_reason = f"Retry limit exceeded ({retry_count} retries attempted >= 3 max limit)"
-    elif amount > 30000 or (proba < 0.50 and amount > 10000):
+    elif amount > 15000 or (proba < 0.60 and amount > 5000) or retry_count == 2:
         status = "HUMAN_REVIEW"
         policy_decision = "HUMAN_REVIEW"
         policy_reason = f"High transaction amount (₹{amount:,.2f}) or low AI confidence ({int(proba*100)}%) requires human operator review"
@@ -80,8 +80,9 @@ for idx, row in sample_df.iterrows():
     }
     transactions.append(txn)
 
-    # Human review cases (realistic proportion ~4% of transactions)
+    # Human review cases
     if status == "HUMAN_REVIEW":
+        is_resolved = (review_idx % 3 == 0)
         human_reviews.append({
             "review_id": review_idx,
             "payment_id": t_id,
@@ -92,15 +93,15 @@ for idx, row in sample_df.iterrows():
             "flag_reason": policy_reason,
             "ai_recommendation": strat,
             "ai_confidence": proba,
-            "status": "PENDING",
-            "human_decision": None,
-            "override_reason": None,
-            "reviewed_by": None,
+            "status": "APPROVED" if is_resolved else "PENDING",
+            "human_decision": strat if is_resolved else None,
+            "override_reason": "Approved by Senior Fintech Ops Lead" if is_resolved else None,
+            "reviewed_by": "Fintech Ops Lead" if is_resolved else None,
             "created_at": str(row["timestamp"])
         })
         review_idx += 1
 
-    # Full compliance audit trail: 4 events per transaction (500 * 4 = 2,000 logs)
+    # Compliance audit trail: 4 events per transaction
     audit_logs.append({
         "id": log_idx,
         "payment_id": t_id,
@@ -151,4 +152,4 @@ with open(output_path, "w") as f:
         "audit_logs": audit_logs
     }, f, indent=2)
 
-print(f"Successfully generated realistic fintech dataset: {len(transactions)} transactions, {len(human_reviews)} escalated human review cases, and {len(audit_logs)} audit logs!")
+print(f"Successfully generated realistic fintech dataset: {len(transactions)} transactions, {len(human_reviews)} human review cases, and {len(audit_logs)} audit logs!")
