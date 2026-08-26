@@ -8,7 +8,8 @@ import {
   Presentation, 
   RefreshCw, 
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Zap
 } from "lucide-react";
 
 interface NavbarProps {
@@ -17,6 +18,7 @@ interface NavbarProps {
   onResetDemo: () => void;
   isLoadingDemo: boolean;
   onOpenPitch: () => void;
+  onOpenChaosModal: () => void;
 }
 
 export default function Navbar({
@@ -24,7 +26,8 @@ export default function Navbar({
   setActiveTab,
   onResetDemo,
   isLoadingDemo,
-  onOpenPitch
+  onOpenPitch,
+  onOpenChaosModal
 }: NavbarProps) {
   const tabs = [
     { id: "overview", label: "Executive Overview", icon: Activity },
@@ -78,19 +81,27 @@ export default function Navbar({
         </nav>
 
         {/* Action Controls */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={onOpenChaosModal}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition-all cursor-pointer"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            <span>Chaos Playground</span>
+          </button>
+
           <button
             onClick={onOpenPitch}
-            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-purple-600/20 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-purple-600/20 transition-all cursor-pointer"
           >
-            <Presentation className="w-4 h-4 text-purple-200" />
+            <Presentation className="w-3.5 h-3.5 text-purple-200" />
             <span>5-Min Pitch Mode</span>
           </button>
 
           <button
             onClick={onResetDemo}
             disabled={isLoadingDemo}
-            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
           >
             <Play className={`w-3.5 h-3.5 ${isLoadingDemo ? "animate-spin" : ""}`} />
             <span>{isLoadingDemo ? "Running..." : "Buildathon Demo Run"}</span>

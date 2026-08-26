@@ -9,6 +9,7 @@ import StrategyOptimizationView from "@/components/StrategyOptimizationView";
 import HumanReviewQueue from "@/components/HumanReviewQueue";
 import AuditTrailView from "@/components/AuditTrailView";
 import PitchDeckModal from "@/components/PitchDeckModal";
+import SimulationScenarioModal from "@/components/SimulationScenarioModal";
 import { CheckCircle2, Sparkles, RefreshCw } from "lucide-react";
 import { 
   api, 
@@ -28,6 +29,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
+  const [showChaosModal, setShowChaosModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,8 +70,7 @@ export default function Home() {
     setIsLoadingDemo(true);
     showNotification("⚡ Initiating Buildathon Batch Simulation across 10,000 payment failures...");
     try {
-      // Simulate real processing latency for realistic feedback
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await api.resetAndRunDemo();
       await loadAllData();
       showNotification("✅ Batch Simulation Run Completed! Successfully re-evaluated 10,000 synthetic payment failures (+2,289% revenue recovery lift).");
@@ -99,6 +100,7 @@ export default function Home() {
         onResetDemo={handleResetDemo}
         isLoadingDemo={isLoadingDemo}
         onOpenPitch={() => setShowPitchModal(true)}
+        onOpenChaosModal={() => setShowChaosModal(true)}
       />
 
       {/* Main Content Area */}
@@ -151,6 +153,13 @@ export default function Home() {
         <PitchDeckModal
           onClose={() => setShowPitchModal(false)}
           onResetDemo={handleResetDemo}
+        />
+      )}
+
+      {/* Chaos Playground Modal */}
+      {showChaosModal && (
+        <SimulationScenarioModal
+          onClose={() => setShowChaosModal(false)}
         />
       )}
 
