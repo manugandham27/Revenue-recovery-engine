@@ -30,22 +30,22 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
     {
       time: "0:00 – 0:30",
       title: "1. The Revenue Recovery Problem",
-      subtitle: "Blind retries waste resources & degrade customer trust",
+      subtitle: "Fixed retries waste resources & degrade customer trust",
       content: (
         <div className="space-y-4 text-xs">
           <div className="bg-rose-950/20 border border-rose-500/30 p-4 rounded-xl text-rose-200">
             <p className="font-semibold text-sm text-rose-400 mb-1">Traditional Problem:</p>
             <p>
-              When payments fail, standard payment gateways blindly retry payments 3-4 times. This wastes network fees, incurs penalty charges on expired cards/insufficient funds, and triggers issuer bank fraud alarms.
+              When payments fail, standard payment gateways retry payments blindly. This wastes network fees, incurs penalty charges on expired cards or low account balances, and triggers issuer bank fraud alarms.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 font-mono">
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Wasted Retries</span>
+              <span className="text-slate-400 block text-[10px]">Unnecessary Retries Avoided</span>
               <span className="text-rose-400 font-bold text-base">20,702 / 21,230</span>
             </div>
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Conventional Recovery Rate</span>
+              <span className="text-slate-400 block text-[10px]">Conventional Baseline Recovery</span>
               <span className="text-amber-400 font-bold text-base">2.64%</span>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
     {
       time: "0:30 – 1:00",
       title: "2. The RevenueOS Solution",
-      subtitle: "Predictive ML + Semantic Diagnosis + Deterministic Policy Safety",
+      subtitle: "Predictive ML + Semantic Diagnosis + Deterministic Safety Policy",
       content: (
         <div className="space-y-4 text-xs">
           <p className="text-slate-300">
@@ -64,7 +64,7 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-slate-950 p-3 rounded-xl border border-blue-500/30">
               <span className="text-blue-400 font-bold block mb-1">1. ML Recoverability</span>
-              <p className="text-slate-400">GradientBoosting model trained on 10k events with held-out ROC-AUC of 99.06%.</p>
+              <p className="text-slate-400">GradientBoosting model with benchmark ROC-AUC of 99.06%.</p>
             </div>
             <div className="bg-slate-950 p-3 rounded-xl border border-purple-500/30">
               <span className="text-purple-400 font-bold block mb-1">2. AI Diagnosis Layer</span>
@@ -89,7 +89,7 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
       content: (
         <div className="space-y-4 text-xs">
           <p className="text-slate-300">
-            Click below to trigger a live production failure scenario evaluation:
+            Click below to trigger a live failure scenario evaluation:
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -140,24 +140,24 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
     },
     {
       time: "2:00 – 3:00",
-      title: "4. Empirical Business Results",
-      subtitle: "Measurable revenue recovery lift on 10,000 synthetic events",
+      title: "4. Benchmark Simulation Results",
+      subtitle: "Evaluated across 10,000 synthetic payment-failure scenarios",
       content: (
         <div className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
               <span className="text-slate-400 block font-medium">Conventional Fixed Retry</span>
               <p className="text-xl font-bold text-slate-300 mt-1">₹5.11 Lakhs Recovered</p>
-              <p className="text-[10px] text-rose-400 mt-1">21,230 attempts made | 2.64% success rate</p>
+              <p className="text-[10px] text-rose-400 mt-1">21,230 attempts made | 2.64% baseline rate</p>
             </div>
             <div className="bg-emerald-950/20 p-4 rounded-xl border border-emerald-500/30">
-              <span className="text-emerald-400 block font-medium">RevenueOS AI Recovery</span>
-              <p className="text-xl font-bold text-emerald-400 mt-1">₹1.22 Crore Recovered</p>
-              <p className="text-[10px] text-emerald-300 mt-1">8,350 attempts made | 79.36% success rate</p>
+              <span className="text-emerald-400 block font-medium">RevenueOS AI Strategy</span>
+              <p className="text-xl font-bold text-emerald-400 mt-1">₹1.22 Cr Simulated Revenue</p>
+              <p className="text-[10px] text-emerald-300 mt-1">8,350 attempts made | 79.36% simulation rate</p>
             </div>
           </div>
           <div className="bg-blue-950/30 border border-blue-500/30 p-3 rounded-xl text-center">
-            <span className="text-blue-300 font-bold text-sm">+₹1.17 Crore Net Incremental Recovery (+2,289% Lift)</span>
+            <span className="text-blue-300 font-bold text-sm">2,289% improvement in simulated recovery value vs. baseline</span>
           </div>
         </div>
       )
@@ -165,11 +165,11 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
     {
       time: "3:00 – 4:00",
       title: "5. Recovery Strategy Optimization",
-      subtitle: "Dynamic strategy selection per failure reason",
+      subtitle: "Data-driven recovery recommendations per failure category",
       content: (
         <div className="space-y-3 text-xs">
           <p className="text-slate-300">
-            RevenueOS builds an empirical matrix mapping failure reasons to top-performing strategies:
+            RevenueOS maps failure characteristics to empirical recovery strategies:
           </p>
           <div className="space-y-2">
             <div className="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
@@ -195,13 +195,13 @@ export default function PitchDeckModal({ onClose, onResetDemo }: PitchDeckModalP
       content: (
         <div className="space-y-4 text-xs">
           <p className="text-slate-300">
-            Safety features designed for enterprise Razorpay payment infrastructure:
+            Safety controls enforcing deterministic operational bounds:
           </p>
           <ul className="space-y-2 text-slate-300 list-disc list-inside">
-            <li><strong className="text-white">Deterministic Safety Policy:</strong> AI only recommends; policy engine approves or blocks.</li>
-            <li><strong className="text-white">Human-in-the-Loop Queue:</strong> High-value (&gt;₹50,000) & low confidence cases escalate to human ops.</li>
-            <li><strong className="text-white">Idempotency Locks:</strong> Guarantee recovery actions never execute twice accidentally.</li>
-            <li><strong className="text-white">Graceful Fallback:</strong> If LLM API fails, deterministic heuristics take over without downtime.</li>
+            <li><strong className="text-white">Deterministic Safety Policy:</strong> AI recommends recovery actions, subject to safety policies.</li>
+            <li><strong className="text-white">Human-in-the-Loop Queue:</strong> High-value (&gt;₹15,000) & low confidence cases escalate to human ops.</li>
+            <li><strong className="text-white">Idempotency Locks:</strong> Avoid duplicate retries classified as unnecessary.</li>
+            <li><strong className="text-white">Graceful Fallback:</strong> If LLM API fails, deterministic rules take over safely.</li>
           </ul>
         </div>
       )
