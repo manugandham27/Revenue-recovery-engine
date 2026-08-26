@@ -78,7 +78,7 @@ export default function AuditTrailView() {
         <div>
           <h2 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
             <FileText className="w-5 h-5 text-blue-400" />
-            <span>Immutable Decision Audit Trail</span>
+            <span>Comprehensive Decision Audit Trail</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             Complete compliance log tracking 2,000+ AI predictions, diagnoses, policy validations, and execution steps.

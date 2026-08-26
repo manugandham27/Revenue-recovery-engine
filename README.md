@@ -1,4 +1,4 @@
-# ⚡ RevenueOS — Production-Oriented Payment Recovery Decision Engine
+# ⚡ Revenue Recovery Engine — Production-Oriented Decision Engine
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20Demo-10B981?style=for-the-badge&logo=vercel)](https://frontend-lilac-rho-75.vercel.app)
 [![Track 03](https://img.shields.io/badge/Razorpay%20Buildathon-Track%2003%20Submission-3B82F6?style=for-the-badge)](https://frontend-lilac-rho-75.vercel.app)
@@ -13,27 +13,31 @@
 
 ## 📌 Executive Summary
 
-**RevenueOS** is a production-oriented recovery decision engine built for high-volume payment processing environments (Razorpay AI Buildathon Track 03).
+**Revenue Recovery Engine** is an AI-powered decision system for failed payments built for Track 03 of the Razorpay AI Buildathon.
 
-Rather than relying on conventional, fixed payment retries—which cause customer friction, gateway penalties, and high failure rates—RevenueOS combines **Gradient Boosting ML recoverability scoring**, **AI root-cause diagnosis**, and **deterministic safety policies** to identify opportunities to recover failed payments while avoiding retries classified as unnecessary by safety policies.
+Instead of retrying every failed transaction blindly—which causes customer friction, gateway penalties, and high failure rates—the engine estimates recoverability, identifies likely failure causes, recommends an optimal recovery strategy, and applies deterministic safety policies before an action is taken.
+
+The system communicates a clear 6-step operational workflow:
+$$\text{Predict} \longrightarrow \text{Diagnose} \longrightarrow \text{Optimize} \longrightarrow \text{Protect} \longrightarrow \text{Recover} \longrightarrow \text{Audit}$$
 
 AI recommends recovery actions, subject to strict deterministic safety policies and human operator oversight.
 
 ---
 
-## 📊 Benchmark Evaluation Results
+## 📊 Benchmark Results
 
-Evaluated across **10,000 synthetic payment-failure scenarios** (`data/synthetic_payments.csv`):
+We evaluated the system across **10,000 synthetic payment-failure scenarios** to measure recoverability prediction and recovery-strategy performance compared with a conventional fixed-retry baseline.
 
-| Evaluation Metric | Conventional Fixed Retry Baseline | RevenueOS Engine | Benchmark Improvement / Impact |
-| :--- | :---: | :---: | :---: |
-| **Simulated Recovery Value** | ₹5,11,676.46 | **₹1,22,27,562.84** | **2,289% improvement in simulated recovery value vs. baseline** |
-| **Simulated Recovery Rate** | 2.64% | **79.36%** | **79.36% recovery rate in our benchmark simulation** |
-| **Retry Attempts Required** | 21,230 attempts | **8,350 attempts** | **60.67% reduction in retry attempt volume** |
-| **Unnecessary Retry Prevention** | 0 retries | **20,702 retries** | **Avoided retries classified as unnecessary by safety policy in benchmark** |
-| **Hold-Out ROC-AUC Score** | — | **99.06%** | **99.06% ROC-AUC on our benchmark dataset (2,000 test samples)** |
+| Evaluation Metric | Conventional Fixed-Retry Baseline | Revenue Recovery Engine | Benchmark Evaluation Context |
+| :--- | :---: | :---: | :--- |
+| **Potential Recoverable Value** | ₹5,11,676.46 | **₹1,22,27,562.84** | **₹1.22 Cr Potential Recoverable Value** *(Simulated benchmark across 10,000 synthetic scenarios)* |
+| **Benchmark Recovery Rate** | 2.64% | **79.36%** | **79.36% Benchmark Recovery Rate** *(Observed in synthetic benchmark simulation)* |
+| **Potential Value Lift vs Baseline** | Baseline | **+₹1,17,15,886.38** | **₹1.17 Cr Potential Value Lift (+2,289% simulated improvement vs baseline)** |
+| **Unnecessary Retry Prevention** | 0 retries | **20,702 retries** | **100% of Policy-Classified Unnecessary Retries Avoided** *(Based on policy rules)* |
+| **Retry Attempt Volume** | 21,230 attempts | **8,350 attempts** | **60.67% Reduction in Unnecessary Attempt Volume** |
+| **ML Model ROC-AUC** | — | **99.06%** | **99.06% ROC-AUC on a held-out synthetic benchmark** *(2,000 test samples)* |
 
-> *Note: Benchmark metrics represent synthetic evaluation results. In live environments, RevenueOS connects to gateway webhooks for continuous data-driven recovery recommendations.*
+> *Note: Results are based on synthetic benchmark data and simulation and should not be interpreted as production payment outcomes.*
 
 ---
 
@@ -42,35 +46,37 @@ Evaluated across **10,000 synthetic payment-failure scenarios** (`data/synthetic
 ```mermaid
 flowchart TD
     A["Ingest Failed Payment Event"] --> B["Predict Recoverability Score<br/>(Gradient Boosting: 99.06% ROC-AUC on benchmark)"]
-    B --> C["Diagnose Failure Root-Cause<br/>(LLM + Deterministic Rule Fallback)"]
-    C --> D["Optimize Strategy Selection<br/>(Delayed Retry / Payment Link / Mandate)"]
+    B --> C["Diagnose Failure Root Cause<br/>(LLM + Deterministic Rule Fallback)"]
+    C --> D["Optimize Recovery Strategy<br/>(Delayed Retry / Payment Link / Mandate)"]
     D --> E{"Enforce Deterministic Safety Policy"}
     
     E -- "Retry Limit >= 3 OR Score < 20%" --> F["POLICY BLOCKED"]
     E -- "Amount > ₹15,000 OR Low Confidence" --> G["HUMAN OVERSIGHT QUEUE<br/>(Escalated to Operator)"]
     E -- "Policy Check Passed" --> H["EXECUTE RECOVERY ACTION"]
     
-    F --> I["Record Audit Trail Log"]
+    F --> I["Comprehensive Decision Audit Trail"]
     G --> I
     H --> I
 ```
 
 ---
 
-## ⭐ Core Features & Capabilities
+## ⭐ Core System Capabilities
 
-1. **Explainable Decision Engine**:
-   - AI recommends recovery actions, subject to strict deterministic safety constraints (*ALLOW / HUMAN REVIEW / BLOCK*).
-2. **Transaction Explorer with 5-Step Visual Decision Timeline**:
-   - Click **"Timeline"** on any transaction to view step-by-step lineage (*Ingestion ➔ ML Score ➔ Root Cause ➔ Policy Check ➔ Action Outcome*).
-3. **Real-World Chaos & Resilience Playground**:
-   - Test system resilience live: *LLM Outage Fallback*, *Idempotency Protection Lock*, and *Max Retries Policy Block*.
-4. **Human-in-the-Loop Oversight Queue**:
-   - Review escalated high-value or low-confidence transactions with interactive operator approval, custom override, and rejection controls.
-5. **Interactive What-If Recovery Simulator**:
-   - Adjust transaction sliders live to calculate ML probability and simulated recovery value improvements.
-6. **Immutable Decision Audit Trail**:
-   - 2,000+ searchable audit logs tracking every decision event with raw JSON inspection.
+1. **Predictive Recoverability Scoring**:
+   - Gradient Boosting model evaluated on a held-out 20% test split (2,000 synthetic samples) achieving 99.06% ROC-AUC and 99.33% PR-AUC.
+2. **AI Failure Root-Cause Diagnosis**:
+   - Semantic LLM diagnosis identifying root causes (3DS OTP timeout, expired card, gateway timeout) with zero-downtime deterministic fallback.
+3. **Transaction Explorer with 5-Step Visual Decision Timeline**:
+   - Interactive timeline showing step-by-step lineage (*Ingestion ➔ ML Score ➔ Root Cause ➔ Policy Check ➔ Action Outcome*).
+4. **Deterministic Safety Policy Engine**:
+   - Hard business bounds (`MAX_RETRIES = 3`, `HIGH_VALUE_THRESHOLD = ₹15,000`, `IDEMPOTENCY_LOCK`) ensuring AI recommends while rules constrain.
+5. **Human-in-the-Loop Oversight Queue**:
+   - 108 escalated human review cases with interactive operator approval, custom strategy override, and rejection controls.
+6. **Real-World Chaos & Resilience Playground**:
+   - Test system resilience live under edge-case conditions (*LLM Outage Fallback*, *Idempotency Protection Lock*, *Max Retries Guard*).
+7. **Comprehensive Decision Audit Trail**:
+   - 2,000+ searchable audit logs recording every prediction, policy rule, strategy, and human action with raw JSON inspection.
 
 ---
 
@@ -84,7 +90,7 @@ flowchart TD
 
 ---
 
-## 💻 Local Quickstart Guide
+## 💻 Local Setup Guide
 
 ```bash
 # 1. Clone Repository
@@ -107,7 +113,7 @@ npm run dev
 
 ---
 
-## 🧪 Automated Testing
+## 🧪 Automated Unit & Policy Testing
 
 ```bash
 pytest backend/tests/
@@ -123,5 +129,5 @@ Output:
 
 - **Developer**: Manu Gandham
 - **GitHub**: [github.com/manugandham27](https://github.com/manugandham27)
-- **Live Project**: [frontend-lilac-rho-75.vercel.app](https://frontend-lilac-rho-75.vercel.app)
+- **Live Web App**: [frontend-lilac-rho-75.vercel.app](https://frontend-lilac-rho-75.vercel.app)
 - **Track**: Razorpay AI Buildathon — Track 03 (AI Revenue Recovery)

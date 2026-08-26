@@ -57,7 +57,7 @@ export default function ExecutiveOverview({
 
   const chartData = [
     {
-      name: "Simulated Recovery Value",
+      name: "Potential Recoverable Value",
       Baseline: baselineData?.baseline?.revenue_recovered || 511676,
       RevenueOS: baselineData?.revenue_os?.revenue_recovered || 12227562,
     },
@@ -88,7 +88,7 @@ export default function ExecutiveOverview({
           <div>
             <h2 className="text-lg font-bold text-white tracking-tight">Production-Oriented Recovery Decision Engine Active</h2>
             <p className="text-xs text-slate-300">
-              Evaluated across 10,000 synthetic payment-failure scenarios. ROC-AUC: <span className="font-semibold text-emerald-400">{(modelEval.roc_auc * 100).toFixed(2)}% on our benchmark dataset</span>
+              Benchmark evaluated across 10,000 synthetic payment-failure scenarios. ROC-AUC: <span className="font-semibold text-emerald-400">{(modelEval.roc_auc * 100).toFixed(2)}% on a held-out synthetic benchmark</span>
             </p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function ExecutiveOverview({
         {/* KPI 2: Potential Recoverable Value */}
         <div className="glass-panel p-5 rounded-2xl border border-slate-800 relative overflow-hidden glow-emerald">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Simulated Recovered Revenue</span>
+            <span className="text-xs font-medium text-slate-400">Potential Recoverable Value</span>
             <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 border border-emerald-500/20">
               <DollarSign className="w-4 h-4" />
             </div>
@@ -134,14 +134,14 @@ export default function ExecutiveOverview({
           </p>
           <div className="flex items-center space-x-1.5 mt-2 text-xs text-emerald-400 font-medium">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>{(metrics?.recovery_rate * 100 || 79.36).toFixed(1)}% recovery rate in simulation</span>
+            <span>{(metrics?.recovery_rate * 100 || 79.36).toFixed(1)}% Benchmark Recovery Rate</span>
           </div>
         </div>
 
-        {/* KPI 3: Improvement vs Baseline */}
+        {/* KPI 3: Potential Value Lift vs Baseline */}
         <div className="glass-panel p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Simulated Gain vs Baseline</span>
+            <span className="text-xs font-medium text-slate-400">Potential Value Lift vs. Baseline</span>
             <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20">
               <TrendingUp className="w-4 h-4" />
             </div>
@@ -151,23 +151,23 @@ export default function ExecutiveOverview({
           </p>
           <div className="flex items-center space-x-1 mt-2 text-xs text-blue-400 font-medium">
             <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>2,289% improvement vs. baseline</span>
+            <span>+2,289% simulated improvement vs baseline</span>
           </div>
         </div>
 
-        {/* KPI 4: Unnecessary Retry Prevention */}
+        {/* KPI 4: Policy-Classified Unnecessary Retries Avoided */}
         <div className="glass-panel p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Unnecessary Retry Prevention</span>
+            <span className="text-xs font-medium text-slate-400">Unnecessary Retries Avoided</span>
             <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400 border border-purple-500/20">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <p className="text-2xl font-bold text-purple-400 mt-3 tracking-tight">
-            {baselineData?.impact?.retry_reduction_percentage || 60.67}% Avoided
+            {baselineData?.impact?.retry_reduction_percentage || 60.67}% Fewer Attempts
           </p>
           <div className="flex items-center space-x-2 mt-2 text-xs text-slate-400">
-            <span>Avoided retries classified as unnecessary</span>
+            <span>100% of policy-classified retries avoided</span>
           </div>
         </div>
 
@@ -182,10 +182,10 @@ export default function ExecutiveOverview({
             <div>
               <h3 className="text-base font-bold text-white tracking-tight flex items-center space-x-2">
                 <BarChart3 className="w-5 h-5 text-blue-400" />
-                <span>Conventional Fixed Retry vs RevenueOS AI Strategy</span>
+                <span>Conventional Fixed-Retry Baseline vs Revenue Recovery Engine</span>
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Evaluated across 10,000 synthetic payment-failure scenarios
+                Benchmark evaluated across 10,000 synthetic payment-failure scenarios
               </p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium">
@@ -212,14 +212,14 @@ export default function ExecutiveOverview({
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 rounded-sm bg-slate-600" />
               <div>
-                <p className="text-slate-400 font-medium">Conventional Fixed Retry</p>
+                <p className="text-slate-400 font-medium">Conventional Fixed-Retry Baseline</p>
                 <p className="text-slate-200 font-semibold">{formatCurrency(baselineData?.baseline?.revenue_recovered || 511676)} (Rate: {((baselineData?.baseline?.recovery_rate || 0.026) * 100).toFixed(1)}%)</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 rounded-sm bg-emerald-500" />
               <div>
-                <p className="text-emerald-400 font-medium">RevenueOS AI Strategy</p>
+                <p className="text-emerald-400 font-medium">Revenue Recovery Engine</p>
                 <p className="text-white font-semibold">{formatCurrency(baselineData?.revenue_os?.revenue_recovered || 12227562)} (Rate: {((baselineData?.revenue_os?.recovery_rate || 0.793) * 100).toFixed(1)}%)</p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function ExecutiveOverview({
               </span>
             </div>
             <p className="text-xs text-slate-400 mb-4">
-              Held-out 20% benchmark test split (2,000 test samples)
+              Held-out 20% synthetic benchmark test split (2,000 samples)
             </p>
 
             {/* Metrics Breakdown Grid */}
@@ -264,7 +264,7 @@ export default function ExecutiveOverview({
 
             {/* ROC-AUC Badge */}
             <div className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/20 rounded-xl p-3 flex items-center justify-between">
-              <span className="text-xs text-purple-300 font-medium">ROC-AUC (Benchmark)</span>
+              <span className="text-xs text-purple-300 font-medium">ROC-AUC (Synthetic Benchmark)</span>
               <span className="text-lg font-extrabold text-purple-400 font-mono">{(modelEval.roc_auc * 100).toFixed(2)}%</span>
             </div>
           </div>
