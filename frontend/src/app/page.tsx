@@ -10,6 +10,7 @@ import HumanReviewQueue from "@/components/HumanReviewQueue";
 import AuditTrailView from "@/components/AuditTrailView";
 import PitchDeckModal from "@/components/PitchDeckModal";
 import SimulationScenarioModal from "@/components/SimulationScenarioModal";
+import WhatIfSimulatorModal from "@/components/WhatIfSimulatorModal";
 import { CheckCircle2, Sparkles, RefreshCw } from "lucide-react";
 import { 
   api, 
@@ -30,6 +31,7 @@ export default function Home() {
   const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
   const [showChaosModal, setShowChaosModal] = useState(false);
+  const [showWhatIfModal, setShowWhatIfModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -101,6 +103,7 @@ export default function Home() {
         isLoadingDemo={isLoadingDemo}
         onOpenPitch={() => setShowPitchModal(true)}
         onOpenChaosModal={() => setShowChaosModal(true)}
+        onOpenWhatIfModal={() => setShowWhatIfModal(true)}
       />
 
       {/* Main Content Area */}
@@ -160,6 +163,13 @@ export default function Home() {
       {showChaosModal && (
         <SimulationScenarioModal
           onClose={() => setShowChaosModal(false)}
+        />
+      )}
+
+      {/* What-If Simulator Modal */}
+      {showWhatIfModal && (
+        <WhatIfSimulatorModal
+          onClose={() => setShowWhatIfModal(false)}
         />
       )}
 

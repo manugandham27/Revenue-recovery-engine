@@ -9,7 +9,9 @@ import {
   RefreshCw, 
   CheckCircle2,
   Sparkles,
-  Zap
+  Zap,
+  Sliders,
+  CheckCircle
 } from "lucide-react";
 
 interface NavbarProps {
@@ -19,6 +21,7 @@ interface NavbarProps {
   isLoadingDemo: boolean;
   onOpenPitch: () => void;
   onOpenChaosModal: () => void;
+  onOpenWhatIfModal: () => void;
 }
 
 export default function Navbar({
@@ -27,7 +30,8 @@ export default function Navbar({
   onResetDemo,
   isLoadingDemo,
   onOpenPitch,
-  onOpenChaosModal
+  onOpenChaosModal,
+  onOpenWhatIfModal
 }: NavbarProps) {
   const tabs = [
     { id: "overview", label: "Executive Overview", icon: Activity },
@@ -42,7 +46,7 @@ export default function Navbar({
     <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-6 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* Brand Logo */}
+        {/* Brand Logo & System Health Status */}
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-white font-extrabold text-xl tracking-wider">R</span>
@@ -50,8 +54,9 @@ export default function Navbar({
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-bold text-white text-lg tracking-tight">RevenueOS</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
-                Track 03
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Engine Healthy</span>
               </span>
             </div>
             <p className="text-xs text-slate-400">AI Revenue Recovery & Safety Engine</p>
@@ -82,6 +87,14 @@ export default function Navbar({
 
         {/* Action Controls */}
         <div className="flex items-center space-x-2">
+          <button
+            onClick={onOpenWhatIfModal}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-semibold transition-all cursor-pointer"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>What-If Simulator</span>
+          </button>
+
           <button
             onClick={onOpenChaosModal}
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold transition-all cursor-pointer"

@@ -1,5 +1,5 @@
 """
-Unit tests for Deterministic Safety Policy Engine.
+Unit tests for Deterministic Safety Policy Engine & Resilience.
 """
 
 import pytest
@@ -9,6 +9,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.core.policy_engine import PolicyEngine
+from app.core.llm_service import LLMService
 
 def test_max_retries_limit():
     payment = {"transaction_id": "TXN_001", "amount": 1000.0, "retry_count": 3}
@@ -46,3 +47,24 @@ def test_idempotency_block():
     result = PolicyEngine.evaluate(payment, prediction, diagnosis, executed_keys)
     assert result["decision"] == "BLOCKED"
     assert result["rule_applied"] == "IDEMPOTENCY_PROTECTION"
+
+def test_llm_fallback():
+    """Verify LLM failure switches seamlessly to deterministic rule diagnosis."""
+    service = LLMService()
+    diag = service._mock_deterministic_diagnosis({
+        "failure_type": "insufficient_funds",
+        "payment_method": "upi",
+        "retry_count": 0,
+        "amount": 2500.0
+    }, 0.65, provider_override="DETERMINISTIC_RULES_FALLBACK")
+    assert diag["recommended_strategy"] == "payment_link"
+    assert diag["provider_used"] == "DETERMINISTIC_RULES_FALLBACK"
+
+def test_recovery_strategy_selection():
+    payment = {"transaction_id": "TXN_EXPIRED", "amount": 5000.0, "retry_count": 0}
+    prediction = {"recoverability_probability": 0.75, "expected_recovery_value": 3750.0}
+    diagnosis = {"recommended_strategy": "alternate_payment_method", "confidence": 0.9}
+    
+    result = PolicyEngine.evaluate(payment, prediction, diagnosis)
+    assert result["decision"] == "ALLOWED"
+    assert result["recommended_strategy"] == "alternate_payment_method"

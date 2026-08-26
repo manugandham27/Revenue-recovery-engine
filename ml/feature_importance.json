@@ -1,170 +1,170 @@
 [
   {
     "feature": "failure_type_insufficient_funds",
-    "importance": 0.3933671884913056
+    "importance": 0.3934
   },
   {
     "feature": "failure_type_expired_card",
-    "importance": 0.20938674070698848
+    "importance": 0.2094
   },
   {
     "feature": "failure_type_customer_action_required",
-    "importance": 0.07885285019386838
+    "importance": 0.0789
   },
   {
     "feature": "failure_type_unknown",
-    "importance": 0.06571000398104865
+    "importance": 0.0657
   },
   {
     "feature": "retry_count",
-    "importance": 0.06047454952361914
+    "importance": 0.0605
   },
   {
     "feature": "customer_historical_success_rate",
-    "importance": 0.04498858586182775
+    "importance": 0.045
   },
   {
     "feature": "failure_type_merchant_configuration",
-    "importance": 0.04478141077831803
+    "importance": 0.0448
   },
   {
     "feature": "failure_type_authentication_failure",
-    "importance": 0.021813329722021633
+    "importance": 0.0218
   },
   {
     "feature": "payment_method_upi",
-    "importance": 0.019219255387180827
+    "importance": 0.0192
   },
   {
     "feature": "failure_type_temporary_network_failure",
-    "importance": 0.016349187665681657
+    "importance": 0.0163
   },
   {
     "feature": "failure_type_bank_decline",
-    "importance": 0.011819852797655793
+    "importance": 0.0118
   },
   {
     "feature": "log_amount",
-    "importance": 0.006636110704070757
+    "importance": 0.0066
   },
   {
     "feature": "previous_success_rate",
-    "importance": 0.005785339262501133
+    "importance": 0.0058
   },
   {
     "feature": "log_time_since_prev_success",
-    "importance": 0.005633869688602469
+    "importance": 0.0056
   },
   {
     "feature": "amount_relative_to_historical_avg",
-    "importance": 0.0035880425420193466
+    "importance": 0.0036
   },
   {
     "feature": "previous_failures",
-    "importance": 0.0015884650777394497
+    "importance": 0.0016
   },
   {
     "feature": "day_of_week",
-    "importance": 0.0012909298327727083
+    "importance": 0.0013
   },
   {
     "feature": "transaction_hour",
-    "importance": 0.0011882055299448754
+    "importance": 0.0012
   },
   {
     "feature": "customer_payment_frequency",
-    "importance": 0.0011497828718471746
+    "importance": 0.0011
   },
   {
     "feature": "device_os_Windows",
-    "importance": 0.0008536420020855689
+    "importance": 0.0009
   },
   {
     "feature": "device_os_Android",
-    "importance": 0.000607661179653769
+    "importance": 0.0006
   },
   {
     "feature": "device_type_mobile",
-    "importance": 0.0005345907348050936
+    "importance": 0.0005
   },
   {
     "feature": "subscription_status_trial",
-    "importance": 0.000526526727063021
+    "importance": 0.0005
   },
   {
     "feature": "payment_method_debit_card",
-    "importance": 0.000495999173536358
+    "importance": 0.0005
   },
   {
     "feature": "device_type_desktop",
-    "importance": 0.00044533635706757896
+    "importance": 0.0004
   },
   {
     "feature": "currency_EUR",
-    "importance": 0.00035894595825424424
+    "importance": 0.0004
   },
   {
     "feature": "device_os_macOS",
-    "importance": 0.0003179334414925427
+    "importance": 0.0003
   },
   {
     "feature": "device_os_iOS",
-    "importance": 0.00026121629327078584
+    "importance": 0.0003
   },
   {
     "feature": "subscription_status_canceled",
-    "importance": 0.0002408248205910906
+    "importance": 0.0002
   },
   {
     "feature": "payment_method_credit_card",
-    "importance": 0.00023431162293574245
+    "importance": 0.0002
   },
   {
     "feature": "country_GB",
-    "importance": 0.00022831572303847
+    "importance": 0.0002
   },
   {
     "feature": "country_IN",
-    "importance": 0.0002251215330077174
+    "importance": 0.0002
   },
   {
     "feature": "payment_method_wallet",
-    "importance": 0.0002205049525904122
+    "importance": 0.0002
   },
   {
     "feature": "country_US",
-    "importance": 0.0002094739716957412
+    "importance": 0.0002
   },
   {
     "feature": "payment_method_net_banking",
-    "importance": 0.0001752908733739076
+    "importance": 0.0002
   },
   {
     "feature": "country_AE",
-    "importance": 0.00015810985051297166
+    "importance": 0.0002
   },
   {
     "feature": "subscription_status_none",
-    "importance": 0.00011150790438965036
+    "importance": 0.0001
   },
   {
     "feature": "subscription_status_active",
-    "importance": 6.457822532294105e-05
+    "importance": 0.0001
   },
   {
     "feature": "device_type_tablet",
-    "importance": 4.522045381800513e-05
+    "importance": 0.0
   },
   {
     "feature": "currency_USD",
-    "importance": 3.227051336649789e-05
+    "importance": 0.0
   },
   {
     "feature": "currency_INR",
-    "importance": 1.870423726902759e-05
+    "importance": 0.0
   },
   {
     "feature": "country_SG",
-    "importance": 1.0212831845092982e-05
+    "importance": 0.0
   }
 ]

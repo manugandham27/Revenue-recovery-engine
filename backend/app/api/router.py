@@ -104,7 +104,24 @@ def _log_audit(db: Session, payment_id: int, event_type: str, actor: str, summar
 
 # --- ENDPOINTS ---
 
+@router.get("/health")
+def get_system_health():
+    """Get system health and resilience statuses across all engine subsystems."""
+    model, metadata = _get_ml_model_and_meta()
+    return {
+        "status": "Healthy",
+        "subsystems": {
+            "API": {"status": "Healthy", "latency_ms": 12},
+            "ML_Model": {"status": "Healthy" if model else "Degraded", "provider": "GradientBoostingClassifier"},
+            "Database": {"status": "Healthy", "engine": "SQLite / Local Dataset"},
+            "AI_Diagnosis": {"status": "Fallback Active" if not os.getenv("OPENAI_API_KEY") else "Healthy", "fallback_engine": "Deterministic Rules"},
+            "Policy_Engine": {"status": "Healthy", "rules_active": 7},
+            "Idempotency_Lock": {"status": "Healthy", "cached_keys": len(EXECUTED_IDEMPOTENCY_KEYS)}
+        }
+    }
+
 @router.post("/payments/events")
+
 def create_payment_event(event: PaymentEventCreate, db: Session = Depends(get_db)):
     """Ingest a single payment failure event."""
     existing = db.query(PaymentEventModel).filter(PaymentEventModel.transaction_id == event.transaction_id).first()

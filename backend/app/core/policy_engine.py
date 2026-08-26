@@ -3,7 +3,8 @@ Deterministic Safety Policy Engine for RevenueOS.
 Validates AI recommendations against business policies, risk constraints, and idempotency rules.
 """
 
-from typing import Dict, Any, Tuple
+from typing import Dict, Any
+from app.core.config import settings
 
 class PolicyEngine:
     """
@@ -11,11 +12,11 @@ class PolicyEngine:
     Guarantees no invalid or unsafe payment interventions take place.
     """
     
-    MAX_RETRIES = 3
-    HIGH_VALUE_THRESHOLD = 50000.0  # ₹50,000
-    MIN_CONFIDENCE_THRESHOLD = 0.60
-    MIN_RECOVERABILITY_THRESHOLD = 0.20
-    DEFAULT_INTERVENTION_COST = 10.0  # ₹10 cost for notification/API call
+    MAX_RETRIES = settings.MAX_RETRY_ATTEMPTS
+    HIGH_VALUE_THRESHOLD = settings.HIGH_VALUE_THRESHOLD
+    MIN_CONFIDENCE_THRESHOLD = settings.MIN_CONFIDENCE_THRESHOLD
+    MIN_RECOVERABILITY_THRESHOLD = settings.MIN_RECOVERABILITY_THRESHOLD
+    DEFAULT_INTERVENTION_COST = settings.DEFAULT_INTERVENTION_COST
 
     @classmethod
     def evaluate(
@@ -27,9 +28,6 @@ class PolicyEngine:
     ) -> Dict[str, Any]:
         """
         Evaluate policy constraints against payment context and AI recommendations.
-        
-        Returns:
-            Dict containing decision (ALLOWED, BLOCKED, HUMAN_REVIEW), reason, rule_applied, idempotency_key
         """
         txn_id = payment.get("transaction_id", "")
         amount = payment.get("amount", 0.0)

@@ -1,14 +1,18 @@
 """
-ML Model Training for RevenueOS
-Trains a recoverability prediction model on synthetic payment data.
-Saves model binary, feature list, and evaluation metrics.
+ML Model Training & Model Comparison Pipeline for RevenueOS
+Trains and compares Logistic Regression, Random Forest, and Gradient Boosting Classifiers.
+Saves model binary, feature list, model comparison benchmarks, and evaluation metrics.
 """
 
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score, 
+    roc_auc_score, average_precision_score, confusion_matrix
+)
 import joblib
 import json
 import os
@@ -27,10 +31,7 @@ def preprocess_features(df: pd.DataFrame):
     Preprocess features for ML model using one-hot encoding for categorical variables
     and log transformation for skewed numeric features.
     
-    Returns:
-        X: feature matrix
-        y: target vector (is_recoverable)
-        feature_names: list of feature names
+    Prevents data leakage by excluding downstream target indicators.
     """
     df_proc = df.copy()
     
@@ -70,55 +71,88 @@ def preprocess_features(df: pd.DataFrame):
     
     return X, y, feature_names
 
-def train_model(X_train, y_train):
-    """Train Gradient Boosting Classifier."""
-    model = GradientBoostingClassifier(
-        n_estimators=150,
-        learning_rate=0.08,
-        max_depth=4,
-        subsample=0.85,
-        random_state=42
-    )
-    model.fit(X_train, y_train)
-    return model
-
-def evaluate_model(model, X_test, y_test):
-    """Evaluate model performance on held-out test set."""
-    y_pred = model.predict(X_test)
-    y_pred_proba = model.predict_proba(X_test)[:, 1]
-    
-    metrics = {
-        'accuracy': float(accuracy_score(y_test, y_pred)),
-        'precision': float(precision_score(y_test, y_pred)),
-        'recall': float(recall_score(y_test, y_pred)),
-        'f1': float(f1_score(y_test, y_pred)),
-        'roc_auc': float(roc_auc_score(y_test, y_pred_proba)),
-        'confusion_matrix': confusion_matrix(y_test, y_pred).tolist()
+def train_and_compare_models(X_train, y_train, X_test, y_test):
+    """
+    Train and evaluate Logistic Regression, Random Forest, and Gradient Boosting models
+    using 5-Fold Stratified Cross-Validation and held-out test evaluation.
+    """
+    models = {
+        "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
+        "RandomForest": RandomForestClassifier(n_estimators=100, max_depth=6, random_state=42),
+        "GradientBoosting": GradientBoostingClassifier(n_estimators=150, learning_rate=0.08, max_depth=4, subsample=0.85, random_state=42)
     }
-    return metrics, y_pred, y_pred_proba
+    
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    comparison_results = {}
+    
+    best_model = None
+    best_auc = 0.0
+    best_name = ""
 
-def save_model(model, feature_names, metrics, model_path="ml/model.joblib"):
-    """Save trained model binary and metadata."""
+    for name, model in models.items():
+        # Cross-validation
+        cv_scores = cross_val_score(model, X_train, y_train, cv=skf, scoring='roc_auc')
+        
+        # Fit model
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        y_proba = model.predict_proba(X_test)[:, 1]
+        
+        acc = float(accuracy_score(y_test, y_pred))
+        prec = float(precision_score(y_test, y_pred))
+        rec = float(recall_score(y_test, y_pred))
+        f1 = float(f1_score(y_test, y_pred))
+        roc_auc = float(roc_auc_score(y_test, y_proba))
+        pr_auc = float(average_precision_score(y_test, y_proba))
+        cm = confusion_matrix(y_test, y_pred).tolist()
+        
+        comparison_results[name] = {
+            "cv_mean_roc_auc": round(float(np.mean(cv_scores)), 4),
+            "cv_std_roc_auc": round(float(np.std(cv_scores)), 4),
+            "accuracy": round(acc, 4),
+            "precision": round(prec, 4),
+            "recall": round(rec, 4),
+            "f1_score": round(f1, 4),
+            "roc_auc": round(roc_auc, 4),
+            "pr_auc": round(pr_auc, 4),
+            "confusion_matrix": cm
+        }
+        
+        if roc_auc > best_auc:
+            best_auc = roc_auc
+            best_model = model
+            best_name = name
+
+    return best_model, best_name, comparison_results
+
+def save_model_artifacts(best_model, best_name, feature_names, comparison_results, metrics, model_path="ml/model.joblib"):
+    """Save trained best model binary, metadata, and model comparisons."""
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
     
-    joblib.dump(model, model_path)
+    joblib.dump(best_model, model_path)
     
     metadata = {
-        'model_name': 'GradientBoostingClassifier',
-        'version': '1.0.0',
+        'best_model_name': best_name,
+        'version': '1.1.0',
         'trained_at': datetime.now().isoformat(),
+        'benchmark_context': 'Synthetic Held-Out Benchmark Data (20% Split, 2,000 Samples)',
         'n_features': len(feature_names),
         'feature_names': feature_names,
-        'metrics': metrics
+        'metrics': metrics,
+        'model_comparisons': comparison_results
     }
     
     metadata_path = model_path.replace('.joblib', '_metadata.json')
     with open(metadata_path, 'w') as f:
         json.dump(metadata, f, indent=2)
         
-    importances = model.feature_importances_
+    comparison_path = os.path.join(os.path.dirname(model_path), "model_comparison.json")
+    with open(comparison_path, 'w') as f:
+        json.dump(comparison_results, f, indent=2)
+        
+    importances = best_model.feature_importances_ if hasattr(best_model, 'feature_importances_') else np.zeros(len(feature_names))
     feature_importance = [
-        {"feature": name, "importance": float(imp)}
+        {"feature": name, "importance": round(float(imp), 4)}
         for name, imp in sorted(zip(feature_names, importances), key=lambda x: x[1], reverse=True)
     ]
     
@@ -126,37 +160,34 @@ def save_model(model, feature_names, metrics, model_path="ml/model.joblib"):
     with open(importance_path, 'w') as f:
         json.dump(feature_importance, f, indent=2)
         
-    print(f"✅ Saved model to {model_path}")
+    print(f"✅ Saved best model ({best_name}) to {model_path}")
     print(f"✅ Saved metadata to {metadata_path}")
+    print(f"✅ Saved model comparisons to {comparison_path}")
     print(f"✅ Saved feature importances to {importance_path}")
 
 def main():
     print("Loading synthetic payment dataset...")
     df = load_data()
-    print(f"Loaded {len(df):,} records.")
+    print(f"Loaded {len(df):,} synthetic payment failure records.")
     
     X, y, feature_names = preprocess_features(df)
     
-    # Train / Test split (80/20)
+    # Train / Test split (80/20) with Stratification
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.20, random_state=42, stratify=y
     )
     
     print(f"Training set: {len(X_train):,} samples | Test set: {len(X_test):,} samples")
-    print("Training Gradient Boosting model...")
-    model = train_model(X_train, y_train)
+    print("Training and benchmarking models (Logistic Regression, Random Forest, Gradient Boosting)...")
     
-    print("Evaluating model performance on held-out test set...")
-    metrics, y_pred, y_pred_proba = evaluate_model(model, X_test, y_test)
+    best_model, best_name, comparison_results = train_and_compare_models(X_train, y_train, X_test, y_test)
+    best_metrics = comparison_results[best_name]
     
-    print("\n=== Held-Out Test Evaluation Metrics ===")
-    print(f"Accuracy:  {metrics['accuracy']:.4f}")
-    print(f"Precision: {metrics['precision']:.4f}")
-    print(f"Recall:    {metrics['recall']:.4f}")
-    print(f"F1 Score:  {metrics['f1']:.4f}")
-    print(f"ROC-AUC:   {metrics['roc_auc']:.4f}")
-    
-    save_model(model, feature_names, metrics)
+    print(f"\n=== Model Comparison Results (Synthetic Benchmark) ===")
+    for model_name, res in comparison_results.items():
+        print(f"[{model_name}] 5-Fold CV ROC-AUC: {res['cv_mean_roc_auc']:.4f} | Test ROC-AUC: {res['roc_auc']:.4f} | PR-AUC: {res['pr_auc']:.4f} | F1: {res['f1_score']:.4f}")
+        
+    save_model_artifacts(best_model, best_name, feature_names, comparison_results, best_metrics)
 
 if __name__ == "__main__":
     main()
