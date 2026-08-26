@@ -1,11 +1,10 @@
 import pandas as pd
 import json
-import os
 
 # Load synthetic payments CSV
 df = pd.read_csv("data/synthetic_payments.csv")
 
-# Select top 500 transactions for rich dataset
+# Select 500 transactions for rich dataset
 sample_df = df.head(500)
 
 transactions = []
@@ -35,15 +34,15 @@ for idx, row in sample_df.iterrows():
     strat = strategies_map.get(f_type, "delayed_retry")
     retry_count = int(row["retry_count"])
     
-    # Determine policy status
+    # Realistic policy classification rules
     if retry_count >= 3:
         status = "BLOCKED"
         policy_decision = "BLOCKED"
         policy_reason = f"Retry limit exceeded ({retry_count} retries attempted >= 3 max limit)"
-    elif amount > 50000 or proba < 0.35:
+    elif amount > 30000 or (proba < 0.50 and amount > 10000):
         status = "HUMAN_REVIEW"
         policy_decision = "HUMAN_REVIEW"
-        policy_reason = "High transaction amount (>₹50,000) or low AI confidence requires human review"
+        policy_reason = f"High transaction amount (₹{amount:,.2f}) or low AI confidence ({int(proba*100)}%) requires human operator review"
     elif row["is_recoverable"] == 1:
         status = "EXECUTED"
         policy_decision = "ALLOWED"
@@ -81,8 +80,8 @@ for idx, row in sample_df.iterrows():
     }
     transactions.append(txn)
 
-    # Human review cases
-    if status == "HUMAN_REVIEW" or amount > 25000:
+    # Human review cases (realistic proportion ~4% of transactions)
+    if status == "HUMAN_REVIEW":
         human_reviews.append({
             "review_id": review_idx,
             "payment_id": t_id,
@@ -101,48 +100,47 @@ for idx, row in sample_df.iterrows():
         })
         review_idx += 1
 
-    # Audit logs
-    if len(audit_logs) < 300:
-        audit_logs.append({
-            "id": log_idx,
-            "payment_id": t_id,
-            "transaction_id": str(row["transaction_id"]),
-            "event_type": "INGESTION",
-            "actor": "SYSTEM",
-            "summary": f"Ingested payment failure event {row['transaction_id']} (Amount: ₹{amount})",
-            "timestamp": str(row["timestamp"])
-        })
-        log_idx += 1
-        audit_logs.append({
-            "id": log_idx,
-            "payment_id": t_id,
-            "transaction_id": str(row["transaction_id"]),
-            "event_type": "ANALYSIS",
-            "actor": "ML_MODEL & LLM_DIAGNOSIS",
-            "summary": f"Predicted recoverability {int(proba * 100)}% (Expected ₹{exp_val}). Diagnosed cause: '{f_type}'",
-            "timestamp": str(row["timestamp"])
-        })
-        log_idx += 1
-        audit_logs.append({
-            "id": log_idx,
-            "payment_id": t_id,
-            "transaction_id": str(row["transaction_id"]),
-            "event_type": "POLICY_CHECK",
-            "actor": "POLICY_ENGINE",
-            "summary": f"Policy decision: {policy_decision}. Reason: {policy_reason}",
-            "timestamp": str(row["timestamp"])
-        })
-        log_idx += 1
-        audit_logs.append({
-            "id": log_idx,
-            "payment_id": t_id,
-            "transaction_id": str(row["transaction_id"]),
-            "event_type": "EXECUTION",
-            "actor": "SIMULATION_ENGINE",
-            "summary": f"Executed strategy '{strat}'. Outcome: {'SUCCESS' if status == 'EXECUTED' else 'BLOCKED'}",
-            "timestamp": str(row["timestamp"])
-        })
-        log_idx += 1
+    # Full compliance audit trail: 4 events per transaction (500 * 4 = 2,000 logs)
+    audit_logs.append({
+        "id": log_idx,
+        "payment_id": t_id,
+        "transaction_id": str(row["transaction_id"]),
+        "event_type": "INGESTION",
+        "actor": "SYSTEM",
+        "summary": f"Ingested payment failure event {row['transaction_id']} (Amount: ₹{amount})",
+        "timestamp": str(row["timestamp"])
+    })
+    log_idx += 1
+    audit_logs.append({
+        "id": log_idx,
+        "payment_id": t_id,
+        "transaction_id": str(row["transaction_id"]),
+        "event_type": "ANALYSIS",
+        "actor": "ML_MODEL & LLM_DIAGNOSIS",
+        "summary": f"Predicted recoverability {int(proba * 100)}% (Expected ₹{exp_val}). Diagnosed cause: '{f_type}'",
+        "timestamp": str(row["timestamp"])
+    })
+    log_idx += 1
+    audit_logs.append({
+        "id": log_idx,
+        "payment_id": t_id,
+        "transaction_id": str(row["transaction_id"]),
+        "event_type": "POLICY_CHECK",
+        "actor": "POLICY_ENGINE",
+        "summary": f"Policy decision: {policy_decision}. Reason: {policy_reason}",
+        "timestamp": str(row["timestamp"])
+    })
+    log_idx += 1
+    audit_logs.append({
+        "id": log_idx,
+        "payment_id": t_id,
+        "transaction_id": str(row["transaction_id"]),
+        "event_type": "EXECUTION",
+        "actor": "SIMULATION_ENGINE",
+        "summary": f"Executed strategy '{strat}'. Outcome: {'SUCCESS' if status == 'EXECUTED' else 'BLOCKED'}",
+        "timestamp": str(row["timestamp"])
+    })
+    log_idx += 1
 
 output_path = "frontend/src/lib/dataset.json"
 with open(output_path, "w") as f:
@@ -153,4 +151,4 @@ with open(output_path, "w") as f:
         "audit_logs": audit_logs
     }, f, indent=2)
 
-print(f"Successfully generated {output_path} with {len(transactions)} transactions, {len(human_reviews)} human review cases, and {len(audit_logs)} audit logs!")
+print(f"Successfully generated realistic fintech dataset: {len(transactions)} transactions, {len(human_reviews)} escalated human review cases, and {len(audit_logs)} audit logs!")

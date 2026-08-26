@@ -9,15 +9,19 @@ import {
   CheckCircle2, 
   XCircle,
   Eye,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { api, MOCK_AUDIT_LOGS } from "@/lib/api";
 
 export default function AuditTrailView() {
   const [logs, setLogs] = useState<any[]>(MOCK_AUDIT_LOGS);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedLog, setSelectedLog] = useState<any>(null);
+
+  const pageSize = 20;
 
   useEffect(() => {
     loadAuditLogs();
@@ -48,6 +52,9 @@ export default function AuditTrailView() {
     );
   });
 
+  const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  const paginatedItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const getEventBadge = (type: string) => {
     switch (type) {
       case "INGESTION":
@@ -74,7 +81,7 @@ export default function AuditTrailView() {
             <span>Immutable Decision Audit Trail</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Complete compliance log tracking every AI prediction, diagnosis, policy validation, and execution step.
+            Complete compliance log tracking 2,000+ AI predictions, diagnoses, policy validations, and execution steps.
           </p>
         </div>
 
@@ -82,9 +89,9 @@ export default function AuditTrailView() {
           <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search audit trail..."
+            placeholder="Search across 2,000+ audit logs..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
           />
         </div>
@@ -105,7 +112,7 @@ export default function AuditTrailView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {filtered.slice(0, 40).map((l) => (
+              {paginatedItems.map((l) => (
                 <tr key={l.id} className="hover:bg-slate-800/40 transition-all">
                   <td className="px-4 py-3.5 font-mono text-slate-400 text-[11px] whitespace-nowrap">
                     {l.timestamp ? new Date(l.timestamp).toLocaleTimeString() : "10:14:02 AM"}
@@ -128,6 +135,34 @@ export default function AuditTrailView() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span>Showing {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, filtered.length)} of {filtered.length} audit logs</span>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white rounded-lg transition-all flex items-center space-x-1 cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Prev</span>
+            </button>
+            
+            <span className="font-mono text-white font-semibold">Page {currentPage} of {totalPages}</span>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white rounded-lg transition-all flex items-center space-x-1 cursor-pointer"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
       </div>
 
       {/* JSON Inspector Modal */}

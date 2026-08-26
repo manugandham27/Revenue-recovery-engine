@@ -13,7 +13,8 @@ import {
   Clock, 
   Zap, 
   FileText,
-  X
+  X,
+  ChevronLeft
 } from "lucide-react";
 import { api, MOCK_TRANSACTIONS } from "@/lib/api";
 
@@ -30,10 +31,12 @@ export default function TransactionExplorer({
 }: TransactionExplorerProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedTxn, setSelectedTxn] = useState<any>(null);
   const [detailData, setDetailData] = useState<any>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
+  const pageSize = 15;
   const listData = (transactions && transactions.length > 0) ? transactions : MOCK_TRANSACTIONS;
 
   const formatCurrency = (amount: number = 0) => {
@@ -75,6 +78,9 @@ export default function TransactionExplorer({
     return matchesSearch && matchesStatus;
   });
 
+  const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  const paginatedItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="space-y-6">
       
@@ -84,9 +90,9 @@ export default function TransactionExplorer({
           <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by Transaction ID, Customer, or Failure..."
+            placeholder="Search across 500+ transactions by ID, Customer, or Failure..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all"
           />
         </div>
@@ -97,14 +103,13 @@ export default function TransactionExplorer({
             <span>Status:</span>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer"
             >
-              <option value="ALL">All Statuses</option>
+              <option value="ALL">All Statuses ({listData.length})</option>
               <option value="EXECUTED">Recovered</option>
               <option value="BLOCKED">Policy Blocked</option>
               <option value="HUMAN_REVIEW">Human Review</option>
-              <option value="INGESTED">Ingested</option>
             </select>
           </div>
 
@@ -133,7 +138,7 @@ export default function TransactionExplorer({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {filtered.slice(0, 30).map((t) => (
+              {paginatedItems.map((t) => (
                 <tr key={t.id} className="hover:bg-slate-800/40 transition-all">
                   <td className="px-5 py-4 font-mono font-medium text-white">
                     {t.transaction_id}
@@ -190,6 +195,34 @@ export default function TransactionExplorer({
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="p-4 bg-slate-900/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span>Showing {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, filtered.length)} of {filtered.length} transactions</span>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white rounded-lg transition-all flex items-center space-x-1 cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Prev</span>
+            </button>
+            
+            <span className="font-mono text-white font-semibold">Page {currentPage} of {totalPages}</span>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white rounded-lg transition-all flex items-center space-x-1 cursor-pointer"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
       </div>
 
       {/* Decision Timeline Modal */}
