@@ -829,7 +829,11 @@ def reset_and_run_demo(db: Session = Depends(get_db)):
     csv_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "synthetic_payments.csv")
     if not os.path.exists(csv_path):
         # Generate on the fly
-        from ....data.scripts.generate_synthetic_data import generate_synthetic_data, save_data
+        import sys
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+        if repo_root not in sys.path:
+            sys.path.insert(0, repo_root)
+        from data.scripts.generate_synthetic_data import generate_synthetic_data, save_data
         df_new = generate_synthetic_data(10000, 42)
         save_data(df_new, csv_path)
         

@@ -138,60 +138,68 @@ export default function TransactionExplorer({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {paginatedItems.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-800/40 transition-all">
-                  <td className="px-5 py-4 font-mono font-medium text-white">
-                    {t.transaction_id}
-                    <div className="text-[10px] text-slate-400 font-sans">{t.customer_id}</div>
-                  </td>
-                  <td className="px-5 py-4 font-semibold text-white">
-                    {formatCurrency(t.amount)}
-                    <div className="text-[10px] text-slate-400 font-normal uppercase">{t.payment_method}</div>
-                  </td>
-                  <td className="px-5 py-4 max-w-xs truncate">
-                    <span className="font-medium text-slate-200">{t.failure_type}</span>
-                    <p className="text-[10px] text-slate-400 truncate">{t.failure_reason}</p>
-                  </td>
-                  <td className="px-5 py-4">
-                    {t.recoverability_probability !== null ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-16 bg-slate-800 h-2 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              t.recoverability_probability >= 0.7
-                                ? "bg-emerald-500"
-                                : t.recoverability_probability >= 0.4
-                                ? "bg-amber-500"
-                                : "bg-rose-500"
-                            }`}
-                            style={{ width: `${t.recoverability_probability * 100}%` }}
-                          />
-                        </div>
-                        <span className="font-mono text-xs font-semibold text-white">
-                          {(t.recoverability_probability * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-slate-500">Pending</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="font-medium text-blue-400">
-                      {t.recommended_strategy ? t.recommended_strategy.replace(/_/g, " ") : "delayed retry"}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">{getStatusBadge(t.status)}</td>
-                  <td className="px-5 py-4 text-right">
-                    <button
-                      onClick={() => handleOpenDetail(t)}
-                      className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg font-medium transition-all inline-flex items-center space-x-1 cursor-pointer"
-                    >
-                      <span>Timeline</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+              {paginatedItems.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-5 py-12 text-center text-slate-400 text-xs">
+                    No transactions match your search query or status filter. Try clearing filters.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                paginatedItems.map((t) => (
+                  <tr key={t.id} className="hover:bg-slate-800/40 transition-all">
+                    <td className="px-5 py-4 font-mono font-medium text-white">
+                      {t.transaction_id}
+                      <div className="text-[10px] text-slate-400 font-sans">{t.customer_id}</div>
+                    </td>
+                    <td className="px-5 py-4 font-semibold text-white">
+                      {formatCurrency(t.amount)}
+                      <div className="text-[10px] text-slate-400 font-normal uppercase">{t.payment_method}</div>
+                    </td>
+                    <td className="px-5 py-4 max-w-xs truncate">
+                      <span className="font-medium text-slate-200">{t.failure_type}</span>
+                      <p className="text-[10px] text-slate-400 truncate">{t.failure_reason}</p>
+                    </td>
+                    <td className="px-5 py-4">
+                      {t.recoverability_probability !== null ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-16 bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                t.recoverability_probability >= 0.7
+                                  ? "bg-emerald-500"
+                                  : t.recoverability_probability >= 0.4
+                                  ? "bg-amber-500"
+                                  : "bg-rose-500"
+                              }`}
+                              style={{ width: `${t.recoverability_probability * 100}%` }}
+                            />
+                          </div>
+                          <span className="font-mono text-xs font-semibold text-white">
+                            {(t.recoverability_probability * 100).toFixed(0)}%
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-500">Pending</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="font-medium text-blue-400">
+                        {t.recommended_strategy ? t.recommended_strategy.replace(/_/g, " ") : "delayed retry"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">{getStatusBadge(t.status)}</td>
+                    <td className="px-5 py-4 text-right">
+                      <button
+                        onClick={() => handleOpenDetail(t)}
+                        className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg font-medium transition-all inline-flex items-center space-x-1 cursor-pointer"
+                      >
+                        <span>Timeline</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -4,17 +4,29 @@ FastAPI Main Application for RevenueOS — AI Revenue Recovery & Optimization En
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import os
 
 from .api.router import router as api_router
 from .db.session import init_db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🚀 Initializing RevenueOS database schema...")
+    try:
+        init_db()
+        print("✅ Database ready.")
+    except Exception as e:
+        print(f"⚠️ Database initialization notice: {e}")
+    yield
 
 app = FastAPI(
     title="RevenueOS API",
     description="AI Revenue Recovery & Optimization Engine for Razorpay AI Buildathon (Track 03)",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # CORS middleware for Next.js frontend integration
@@ -25,13 +37,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize database schema on startup
-@app.on_event("startup")
-async def on_startup():
-    print("🚀 Initializing RevenueOS database schema...")
-    init_db()
-    print("✅ Database ready.")
 
 # Register API Router
 app.include_router(api_router, prefix="/api/v1")

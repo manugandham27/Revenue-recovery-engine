@@ -1,11 +1,11 @@
 [
   {
     "feature": "failure_type_insufficient_funds",
-    "importance": 0.3934
+    "importance": 0.3936
   },
   {
     "feature": "failure_type_expired_card",
-    "importance": 0.2094
+    "importance": 0.2095
   },
   {
     "feature": "failure_type_customer_action_required",
@@ -17,7 +17,7 @@
   },
   {
     "feature": "retry_count",
-    "importance": 0.0605
+    "importance": 0.0601
   },
   {
     "feature": "customer_historical_success_rate",
@@ -25,19 +25,19 @@
   },
   {
     "feature": "failure_type_merchant_configuration",
-    "importance": 0.0448
+    "importance": 0.045
   },
   {
     "feature": "failure_type_authentication_failure",
-    "importance": 0.0218
+    "importance": 0.022
   },
   {
     "feature": "payment_method_upi",
-    "importance": 0.0192
+    "importance": 0.019
   },
   {
     "feature": "failure_type_temporary_network_failure",
-    "importance": 0.0163
+    "importance": 0.0164
   },
   {
     "feature": "failure_type_bank_decline",
@@ -45,7 +45,7 @@
   },
   {
     "feature": "log_amount",
-    "importance": 0.0066
+    "importance": 0.0062
   },
   {
     "feature": "previous_success_rate",
@@ -53,34 +53,34 @@
   },
   {
     "feature": "log_time_since_prev_success",
-    "importance": 0.0056
+    "importance": 0.0057
   },
   {
     "feature": "amount_relative_to_historical_avg",
-    "importance": 0.0036
+    "importance": 0.0041
   },
   {
     "feature": "previous_failures",
-    "importance": 0.0016
-  },
-  {
-    "feature": "day_of_week",
-    "importance": 0.0013
-  },
-  {
-    "feature": "transaction_hour",
-    "importance": 0.0012
-  },
-  {
-    "feature": "customer_payment_frequency",
-    "importance": 0.0011
+    "importance": 0.0018
   },
   {
     "feature": "device_os_Windows",
-    "importance": 0.0009
+    "importance": 0.0012
   },
   {
-    "feature": "device_os_Android",
+    "feature": "transaction_hour",
+    "importance": 0.001
+  },
+  {
+    "feature": "day_of_week",
+    "importance": 0.001
+  },
+  {
+    "feature": "customer_payment_frequency",
+    "importance": 0.001
+  },
+  {
+    "feature": "subscription_status_trial",
     "importance": 0.0006
   },
   {
@@ -88,11 +88,7 @@
     "importance": 0.0005
   },
   {
-    "feature": "subscription_status_trial",
-    "importance": 0.0005
-  },
-  {
-    "feature": "payment_method_debit_card",
+    "feature": "device_os_Android",
     "importance": 0.0005
   },
   {
@@ -100,11 +96,15 @@
     "importance": 0.0004
   },
   {
-    "feature": "currency_EUR",
-    "importance": 0.0004
+    "feature": "device_os_macOS",
+    "importance": 0.0003
   },
   {
-    "feature": "device_os_macOS",
+    "feature": "currency_EUR",
+    "importance": 0.0003
+  },
+  {
+    "feature": "payment_method_debit_card",
     "importance": 0.0003
   },
   {
@@ -112,31 +112,15 @@
     "importance": 0.0003
   },
   {
-    "feature": "subscription_status_canceled",
-    "importance": 0.0002
-  },
-  {
-    "feature": "payment_method_credit_card",
-    "importance": 0.0002
-  },
-  {
-    "feature": "country_GB",
-    "importance": 0.0002
-  },
-  {
     "feature": "country_IN",
+    "importance": 0.0003
+  },
+  {
+    "feature": "currency_USD",
     "importance": 0.0002
   },
   {
-    "feature": "payment_method_wallet",
-    "importance": 0.0002
-  },
-  {
-    "feature": "country_US",
-    "importance": 0.0002
-  },
-  {
-    "feature": "payment_method_net_banking",
+    "feature": "subscription_status_canceled",
     "importance": 0.0002
   },
   {
@@ -144,27 +128,43 @@
     "importance": 0.0002
   },
   {
-    "feature": "subscription_status_none",
+    "feature": "payment_method_net_banking",
+    "importance": 0.0002
+  },
+  {
+    "feature": "country_US",
+    "importance": 0.0002
+  },
+  {
+    "feature": "country_GB",
     "importance": 0.0001
   },
   {
-    "feature": "subscription_status_active",
+    "feature": "payment_method_wallet",
+    "importance": 0.0001
+  },
+  {
+    "feature": "currency_INR",
     "importance": 0.0001
   },
   {
     "feature": "device_type_tablet",
-    "importance": 0.0
+    "importance": 0.0001
   },
   {
-    "feature": "currency_USD",
-    "importance": 0.0
-  },
-  {
-    "feature": "currency_INR",
-    "importance": 0.0
+    "feature": "subscription_status_none",
+    "importance": 0.0001
   },
   {
     "feature": "country_SG",
+    "importance": 0.0
+  },
+  {
+    "feature": "payment_method_credit_card",
+    "importance": 0.0
+  },
+  {
+    "feature": "subscription_status_active",
     "importance": 0.0
   }
 ]
